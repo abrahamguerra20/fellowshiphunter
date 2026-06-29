@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fellowship Hunter | Academic Calls Curation</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* CSS Variables */
+        :root {
+            --navy: #233B52;
+            --steel: #325879;
+            --gold: #E5A818;
+            --cream: #F0EBE3;
+            --white: #FFFFFF;
+            
+            --font-head: 'Lora', serif;
+            --font-body: 'Work Sans', sans-serif;
+            
+            --transition: all 0.3s ease;
+        }
+
+        /* Base & Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--cream);
+            color: var(--navy);
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-head);
+            color: var(--navy);
+            line-height: 1.2;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: var(--transition);
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        img {
+            max-width: 100%;
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background-color: var(--gold);
+            color: var(--navy);
+        }
+
+        .btn-primary:hover {
+            background-color: transparent;
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border-color: var(--white);
+            color: var(--white);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--white);
+            color: var(--navy);
+        }
+
+        /* 1. Header */
+        header {
+            background-color: var(--white);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .header-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-family: var(--font-head);
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--navy);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .nav-links a:hover {
+            color: var(--gold);
+        }
+
+        .lang-toggle {
+            display: flex;
+            gap: 10px;
+        }
+
+        .lang-btn {
+            background: none;
+            border: none;
+            font-family: var(--font-body);
+            font-weight: 600;
+            color: var(--steel);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .lang-btn.active {
+            color: var(--gold);
+        }
+
+        .lang-btn:hover {
+            color: var(--navy);
+        }
+
+        /* 2. Hero Section */
+        .hero {
+            background-color: var(--navy);
+            color: var(--white);
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            color: var(--white);
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--cream);
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* 3. What We Do */
+        .what-we-do {
+            padding: 80px 0;
+            background-color: var(--white);
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 50px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 40px;
+        }
+
+        .feature-card {
+            padding: 20px;
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--gold);
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        /* 4. Active Calls */
+        .active-calls {
+            padding: 80px 0;
+            background-color: var(--cream);
+        }
+
+        .calls-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .call-card {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: var(--transition);
+            border-top: 4px solid var(--steel);
+        }
+
+        .call-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border-top-color: var(--gold);
+        }
+
+        .call-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: var(--steel);
+            font-weight: 600;
+        }
+
+        .call-card h3 {
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .call-details {
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .call-details p {
+            margin-bottom: 5px;
+        }
+
+        .call-details strong {
+            color: var(--navy);
+        }
+
+        /* 5. How it works */
+        .how-it-works {
+            padding: 80px 0;
+            background-color: var(--white);
+            text-align: center;
+        }
+
+        .steps-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin-top: 50px;
+            position: relative;
+        }
+
+        .step {
+            flex: 1;
+            padding: 20px;
+            position: relative;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background-color: var(--steel);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-head);
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin: 0 auto 20px;
+        }
+
+        .step h3 {
+            margin-bottom: 10px;
+        }
+
+        /* 6. Services */
+        .services {
+            padding: 80px 0;
+            background-color: var(--navy);
+            color: var(--white);
+        }
+
+        .services .section-title {
+            color: var(--white);
+            text-align: center;
+        }
+
+        .services-subtitle {
+            text-align: center;
+            color: var(--gold);
+            font-weight: 600;
+            margin-bottom: 50px;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .services-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .service-item {
+            background-color: var(--steel);
+            padding: 20px 30px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: var(--transition);
+        }
+
+        .service-item:hover {
+            background-color: rgba(229, 168, 24, 0.1);
+            border-left: 4px solid var(--gold);
+        }
+
+        .service-item i {
+            font-size: 1.5rem;
+        }
+
+        /* 7. Newsletter */
+        .newsletter {
+            padding: 80px 0;
+            background-color: var(--gold);
+            text-align: center;
+            color: var(--navy);
+        }
+
+        .newsletter h2 {
+            color: var(--navy);
+            margin-bottom: 15px;
+        }
+
+        .newsletter p {
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .newsletter-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .newsletter-form input {
+            padding: 15px;
+            border: none;
+            border-radius: 4px;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            width: 100%;
+            outline: none;
+        }
+
+        .newsletter-form button {
+            background-color: var(--navy);
+            color: var(--white);
+            border: none;
+            padding: 15px 30px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .newsletter-form button:hover {
+            background-color: var(--steel);
+        }
+
+        /* 8. Footer */
+        footer {
+            background-color: var(--navy);
+            color: var(--cream);
+            padding: 40px 0 20px;
+            text-align: center;
+            border-top: 1px solid var(--steel);
+        }
+
+        .footer-logo {
+            font-family: var(--font-head);
+            font-size: 1.5rem;
+            color: var(--white);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .social-links a {
+            color: var(--cream);
+        }
+
+        .social-links a:hover {
+            color: var(--gold);
+        }
+
+        .copyright {
+            font-size: 0.85rem;
+            color: var(--steel);
+        }
+
+        /* Media Queries (Tablet & Desktop) */
+        @media (min-width: 768px) {
+            .hero h1 { font-size: 3.5rem; }
+            .features-grid { grid-template-columns: repeat(3, 1fr); }
+            .calls-grid { grid-template-columns: repeat(2, 1fr); }
+            .steps-container { flex-direction: row; }
+            .services-list { grid-template-columns: repeat(2, 1fr); }
+            .newsletter-form { flex-direction: row; }
+            
+            /* Add connecting line for steps */
+            .steps-container::before {
+                content: '';
+                position: absolute;
+                top: 40px;
+                left: 10%;
+                width: 80%;
+                height: 2px;
+                background-color: var(--cream);
+                z-index: 0;
+            }
+            .step { z-index: 1; }
+        }
+
+        @media (min-width: 1024px) {
+            .calls-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. Header -->
+    <header>
+        <div class="container header-inner">
+            <div class="logo">
+                🎯 <span data-i18n="logo">Fellowship Hunter</span>
+            </div>
+            <nav class="nav-links">
+                <a href="#home" data-i18n="nav_home">Home</a>
+                <a href="#calls" data-i18n="nav_calls">Calls</a>
+                <a href="#how-it-works" data-i18n="nav_how">How it works</a>
+                <a href="#services" data-i18n="nav_services">Services</a>
+                <a href="#contact" data-i18n="nav_contact">Contact</a>
+            </nav>
+            <div class="lang-toggle">
+                <button class="lang-btn active" onclick="changeLanguage('en')">EN</button>
+                <button class="lang-btn" onclick="changeLanguage('es')">ES</button>
+                <button class="lang-btn" onclick="changeLanguage('pt')">PT</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. Hero Section -->
+    <section id="home" class="hero">
+        <div class="container">
+            <h1 data-i18n="hero_title">The system doesn't find you. You hunt it down.</h1>
+            <p data-i18n="hero_subtitle">An academic calls curation platform and strategic advisory network for Latin American researchers.</p>
+            <div class="hero-btns">
+                <a href="#calls" class="btn btn-primary" data-i18n="btn_explore">Explore Active Calls</a>
+                <a href="#services" class="btn btn-secondary" data-i18n="btn_audit">Audit My Profile</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. What we do -->
+    <section class="what-we-do">
+        <div class="container">
+            <h2 class="section-title" data-i18n="what_title">Our Methodology</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📡</div>
+                    <h3 data-i18n="feat1_title">Find</h3>
+                    <p data-i18n="feat1_desc">We scan the global academic landscape to bring you fully funded opportunities, filtering out the noise.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3 data-i18n="feat2_title">Contextualize</h3>
+                    <p data-i18n="feat2_desc">No generic links. We break down the eligibility, actual requirements, and unspoken expectations of the committee.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📣</div>
+                    <h3 data-i18n="feat3_title">Advise</h3>
+                    <p data-i18n="feat3_desc">From your CV to the interview, we provide tactical mentoring to turn your application into a winning proposal.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Active Calls -->
+    <section id="calls" class="active-calls">
+        <div class="container">
+            <h2 class="section-title" data-i18n="calls_title">Active Opportunities</h2>
+            <div class="calls-grid">
+                <!-- Card 1 -->
+                <div class="call-card">
+                    <div class="call-header">
+                        <span>🇬🇧 United Kingdom</span>
+                        <span>Deadline: Jul 20, 2026</span>
+                    </div>
+                    <h3>PhD in Biosensor Engineering</h3>
+                    <div class="call-details">
+                        <p><strong>Funding:</strong> £31,805 per yr (Fully Funded)</p>
+                        <p><strong>Field:</strong> Synthetic Biology, Microfluidics</p>
+                        <p><strong>Duration:</strong> 4 Years | Sept 2026 Start</p>
+                    </div>
+                    <a href="#" class="btn btn-primary" style="width: 100%;" data-i18n="btn_details">View Details</a>
+                </div>
+                <!-- Card 2 -->
+                <div class="call-card">
+                    <div class="call-header">
+                        <span>🇮🇹 Italy (Padua)</span>
+                        <span>Deadline: Aug 15, 2026</span>
+                    </div>
+                    <h3>Postdoc in Pangenomics</h3>
+                    <div class="call-details">
+                        <p><strong>Funding:</strong> Standard EU Postdoc Rate</p>
+                        <p><strong>Field:</strong> Comparative Genomics, Metagenomics</p>
+                        <p><strong>Duration:</strong> 2 Years</p>
+                    </div>
+                    <a href="#" class="btn btn-primary" style="width: 100%;" data-i18n="btn_details">View Details</a>
+                </div>
+                <!-- Card 3 -->
+                <div class="call-card">
+                    <div class="call-header">
+                        <span>🇧🇷 Brazil (UNESP)</span>
+                        <span>Deadline: Sep 01, 2026</span>
+                    </div>
+                    <h3>MSc Fellowship: Plant Microbiome</h3>
+                    <div class="call-details">
+                        <p><strong>Funding:</strong> FAPESP Scholarship</p>
+                        <p><strong>Field:</strong> Genetics, Plant Breeding, Bioinformatics</p>
+                        <p><strong>Duration:</strong> 2 Years</p>
+                    </div>
+                    <a href="#" class="btn btn-primary" style="width: 100%;" data-i18n="btn_details">View Details</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. How it works -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <h2 class="section-title" data-i18n="how_title">The Hunter's Path</h2>
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3 data-i18n="step1_title">Discover</h3>
+                    <p data-i18n="step1_desc">Browse our curated feed of high-tier, fully funded academic positions.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3 data-i18n="step2_title">Strategize</h3>
+                    <p data-i18n="step2_desc">Identify your gaps and align your academic narrative with the call's true requirements.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3 data-i18n="step3_title">Execute</h3>
+                    <p data-i18n="step3_desc">Submit a flawless, peer-reviewed application and prepare for the committee defense.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. Services -->
+    <section id="services" class="services">
+        <div class="container">
+            <h2 class="section-title" data-i18n="serv_title">Strategic Advisory Services</h2>
+            <p class="services-subtitle" data-i18n="serv_subtitle">POWERED BY THE RICAI RESEARCH NETWORK</p>
+            
+            <div class="services-list">
+                <div class="service-item">
+                    <i>🔍</i>
+                    <span data-i18n="serv1">Strategic Profile Audit & Blind-Spot Detection</span>
+                </div>
+                <div class="service-item">
+                    <i>✍️</i>
+                    <span data-i18n="serv2">High-Impact Motivation Letters & Storytelling</span>
+                </div>
+                <div class="service-item">
+                    <i>📋</i>
+                    <span data-i18n="serv3">Research Proposal Optimization (RICAI Peer-Reviewed)</span>
+                </div>
+                <div class="service-item">
+                    <i>🎯</i>
+                    <span data-i18n="serv4">Committee Defense & Interview Training</span>
+                </div>
+                <div class="service-item">
+                    <i>🌐</i>
+                    <span data-i18n="serv5">Mentored by actively publishing scientists</span>
+                </div>
+                <div class="service-item">
+                    <i>🤝</i>
+                    <span data-i18n="serv6">Direct access to a global open-science network</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. Newsletter -->
+    <section id="contact" class="newsletter">
+        <div class="container">
+            <h2 data-i18n="news_title">Don't miss the next shot.</h2>
+            <p data-i18n="news_desc">Join our network and get exclusive calls and strategic insights delivered to your inbox.</p>
+            <form class="newsletter-form" onsubmit="event.preventDefault();">
+                <input type="email" placeholder="Email address" required data-i18n-placeholder="news_placeholder">
+                <button type="submit" data-i18n="news_btn">Join the Hunt</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- 8. Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-logo" data-i18n="logo">Fellowship Hunter</div>
+            <div class="social-links">
+                <a href="#">X (Twitter)</a>
+                <a href="#">Instagram</a>
+                <a href="#">LinkedIn</a>
+            </div>
+            <p class="copyright">
+                &copy; 2026 Fellowship Hunter. <span data-i18n="foot_rights">All rights reserved.</span> <span data-i18n="foot_ricai">In partnership with RICAI.</span>
+            </p>
+        </div>
+    </footer>
+
+    <!-- JavaScript for i18n -->
+    <script>
+        const translations = {
+            en: {
+                logo: "Fellowship Hunter",
+                nav_home: "Home",
+                nav_calls: "Calls",
+                nav_how: "How it works",
+                nav_services: "Services",
+                nav_contact: "Contact",
+                hero_title: "The system doesn't find you. You hunt it down.",
+                hero_subtitle: "An academic calls curation platform and strategic advisory network for Latin American researchers.",
+                btn_explore: "Explore Active Calls",
+                btn_audit: "Audit My Profile",
+                what_title: "Our Methodology",
+                feat1_title: "Find",
+                feat1_desc: "We scan the global academic landscape to bring you fully funded opportunities, filtering out the noise.",
+                feat2_title: "Contextualize",
+                feat2_desc: "No generic links. We break down the eligibility, actual requirements, and unspoken expectations of the committee.",
+                feat3_title: "Advise",
+                feat3_desc: "From your CV to the interview, we provide tactical mentoring to turn your application into a winning proposal.",
+                calls_title: "Active Opportunities",
+                btn_details: "View Details",
+                how_title: "The Hunter's Path",
+                step1_title: "Discover",
+                step1_desc: "Browse our curated feed of high-tier, fully funded academic positions.",
+                step2_title: "Strategize",
+                step2_desc: "Identify your gaps and align your academic narrative with the call's true requirements.",
+                step3_title: "Execute",
+                step3_desc: "Submit a flawless, peer-reviewed application and prepare for the committee defense.",
+                serv_title: "Strategic Advisory Services",
+                serv_subtitle: "POWERED BY THE RICAI RESEARCH NETWORK",
+                serv1: "Strategic Profile Audit & Blind-Spot Detection",
+                serv2: "High-Impact Motivation Letters & Storytelling",
+                serv3: "Research Proposal Optimization (RICAI Peer-Reviewed)",
+                serv4: "Committee Defense & Interview Training",
+                serv5: "Mentored by actively publishing scientists",
+                serv6: "Direct access to a global open-science network",
+                news_title: "Don't miss the next shot.",
+                news_desc: "Join our network and get exclusive calls and strategic insights delivered to your inbox.",
+                news_placeholder: "Email address",
+                news_btn: "Join the Hunt",
+                foot_rights: "All rights reserved.",
+                foot_ricai: "In partnership with RICAI."
+            },
+            es: {
+                logo: "Fellowship Hunter",
+                nav_home: "Inicio",
+                nav_calls: "Convocatorias",
+                nav_how: "Cómo funciona",
+                nav_services: "Servicios",
+                nav_contact: "Contacto",
+                hero_title: "El sistema no te encuentra. Tú lo cazas.",
+                hero_subtitle: "Una plataforma de curación de convocatorias académicas y red de asesoría estratégica para investigadores latinoamericanos.",
+                btn_explore: "Explorar Convocatorias",
+                btn_audit: "Auditar mi Perfil",
+                what_title: "Nuestra Metodología",
+                feat1_title: "Rastrear",
+                feat1_desc: "Escaneamos el panorama académico global para traerte oportunidades totalmente financiadas, eliminando el ruido.",
+                feat2_title: "Contextualizar",
+                feat2_desc: "Cero enlaces genéricos. Desglosamos la elegibilidad, los requisitos reales y las expectativas no dichas del comité.",
+                feat3_title: "Asesorar",
+                feat3_desc: "Desde tu CV hasta la entrevista, brindamos mentoría táctica para convertir tu aplicación en una propuesta ganadora.",
+                calls_title: "Oportunidades Activas",
+                btn_details: "Ver Detalles",
+                how_title: "El Camino del Cazador",
+                step1_title: "Descubrir",
+                step1_desc: "Explora nuestro feed curado de posiciones académicas financiadas de alto nivel.",
+                step2_title: "Estrategizar",
+                step2_desc: "Identifica tus debilidades y alinea tu narrativa académica con los verdaderos requisitos de la convocatoria.",
+                step3_title: "Ejecutar",
+                step3_desc: "Envía una aplicación impecable, revisada por pares, y prepárate para la defensa ante el comité.",
+                serv_title: "Servicios de Asesoría Estratégica",
+                serv_subtitle: "IMPULSADO POR LA RED DE INVESTIGACIÓN RICAI",
+                serv1: "Auditoría Estratégica de Perfil y Detección de Puntos Ciegos",
+                serv2: "Cartas de Motivación de Alto Impacto y Storytelling",
+                serv3: "Optimización de Propuestas de Investigación (Revisión RICAI)",
+                serv4: "Entrenamiento para Entrevistas y Defensa ante Comité",
+                serv5: "Mentoría por científicos publicando activamente",
+                serv6: "Acceso directo a una red global de ciencia abierta",
+                news_title: "No pierdas el próximo tiro.",
+                news_desc: "Únete a nuestra red y recibe convocatorias exclusivas y tácticas estratégicas en tu bandeja de entrada.",
+                news_placeholder: "Correo electrónico",
+                news_btn: "Únete a la Caza",
+                foot_rights: "Todos los derechos reservados.",
+                foot_ricai: "En alianza con RICAI."
+            },
+            pt: {
+                logo: "Fellowship Hunter",
+                nav_home: "Início",
+                nav_calls: "Vagas",
+                nav_how: "Como funciona",
+                nav_services: "Serviços",
+                nav_contact: "Contato",
+                hero_title: "O sistema não encontra você. Você o caça.",
+                hero_subtitle: "Uma plataforma de curadoria de vagas acadêmicas e rede de consultoria estratégica para pesquisadores latino-americanos.",
+                btn_explore: "Explorar Vagas Ativas",
+                btn_audit: "Auditar meu Perfil",
+                what_title: "Nossa Metodologia",
+                feat1_title: "Rastrear",
+                feat1_desc: "Mapeamos o cenário acadêmico global para trazer oportunidades totalmente financiadas, filtrando o ruído.",
+                feat2_title: "Contextualizar",
+                feat2_desc: "Sem links genéricos. Detalhamos a elegibilidade, requisitos reais e as expectativas ocultas do comitê.",
+                feat3_title: "Assessorar",
+                feat3_desc: "Do seu currículo à entrevista, oferecemos mentoria tática para transformar sua candidatura em uma proposta vencedora.",
+                calls_title: "Oportunidades Ativas",
+                btn_details: "Ver Detalhes",
+                how_title: "O Caminho do Caçador",
+                step1_title: "Descobrir",
+                step1_desc: "Navegue em nosso feed selecionado de posições acadêmicas de alto nível totalmente financiadas.",
+                step2_title: "Estrategiar",
+                step2_desc: "Identifique suas lacunas e alinhe sua narrativa acadêmica com os verdadeiros requisitos da vaga.",
+                step3_title: "Executar",
+                step3_desc: "Envie uma candidatura impecável, revisada por pares, e prepare-se para a defesa no comitê.",
+                serv_title: "Serviços de Consultoria Estratégica",
+                serv_subtitle: "IMPULSIONADO PELA REDE DE PESQUISA RICAI",
+                serv1: "Auditoria Estratégica de Perfil e Detecção de Pontos Cegos",
+                serv2: "Cartas de Motivação de Alto Impacto e Storytelling",
+                serv3: "Otimização de Proposta de Pesquisa (Revisão RICAI)",
+                serv4: "Treinamento para Entrevistas e Defesa no Comitê",
+                serv5: "Mentoria por cientistas publicando ativamente",
+                serv6: "Acesso direto a uma rede global de ciência aberta",
+                news_title: "Não perca o próximo tiro.",
+                news_desc: "Junte-se à nossa rede e receba vagas exclusivas e insights estratégicos em sua caixa de entrada.",
+                news_placeholder: "E-mail",
+                news_btn: "Junte-se à Caçada",
+                foot_rights: "Todos os direitos reservados.",
+                foot_ricai: "Em parceria com RICAI."
+            }
+        };
+
+        function changeLanguage(lang) {
+            // Update active button state
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.innerText.toLowerCase() === lang) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Update standard text elements
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    element.innerText = translations[lang][key];
+                }
+            });
+
+            // Update placeholders
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+                const key = element.getAttribute('data-i18n-placeholder');
+                if (translations[lang][key]) {
+                    element.placeholder = translations[lang][key];
+                }
+            });
+            
+            // Set HTML lang attribute
+            document.documentElement.lang = lang;
+        }
+    </script>
+</body>
+</html>
