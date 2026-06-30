@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Active Calls | Fellowship Hunter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#233B52; --steel:#325879; --gold:#E5A818; --gold-lt:#F9DD9A;
+  --cream:#F0EBE3; --white:#FFFFFF; --dark:#141E27; --muted:#5A7080;
+  --border:rgba(35,59,82,0.1);
+  --font-h:'Lora',serif; --font-b:'Work Sans',sans-serif;
+  --t:0.22s;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-b);background:var(--cream);color:var(--navy);line-height:1.65;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:var(--font-h);line-height:1.2}
+a{text-decoration:none;color:inherit}
+ul{list-style:none}
+
+/* ── HEADER ── */
+header{position:sticky;top:0;z-index:900;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:68px;max-width:1160px;margin:0 auto;padding:0 24px;gap:20px}
+.logo{font-family:var(--font-h);font-weight:700;font-size:1.2rem;color:var(--navy);display:flex;align-items:center;gap:10px}
+.logo-mark{width:32px;height:32px;background:var(--navy);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.logo-mark svg{width:16px;height:16px}
+nav.main-nav{display:flex;gap:2px}
+nav.main-nav a{font-size:.85rem;font-weight:500;color:var(--steel);padding:6px 12px;border-radius:4px;transition:color var(--t),background var(--t)}
+nav.main-nav a:hover,nav.main-nav a.active{color:var(--navy);background:var(--cream)}
+nav.main-nav a.active{font-weight:700;color:var(--gold)}
+.lang-toggle{display:flex;gap:2px;border:1px solid var(--border);border-radius:6px;padding:3px;background:var(--cream)}
+.lang-btn{background:none;border:none;font-family:var(--font-b);font-size:.76rem;font-weight:700;color:var(--muted);cursor:pointer;padding:4px 9px;border-radius:4px;transition:all var(--t)}
+.lang-btn.active{background:var(--navy);color:#fff}
+
+/* ── PAGE HERO ── */
+.page-hero{background:var(--dark);padding:64px 0 52px;position:relative;overflow:hidden}
+.page-hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(229,168,24,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(229,168,24,.05) 1px,transparent 1px);background-size:50px 50px;pointer-events:none}
+.page-hero-inner{position:relative;z-index:2;max-width:1160px;margin:0 auto;padding:0 24px}
+.page-hero-tag{display:inline-flex;align-items:center;gap:8px;font-size:.7rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);border:1px solid rgba(229,168,24,.3);border-radius:50px;padding:5px 14px;margin-bottom:20px;background:rgba(229,168,24,.06)}
+.page-hero h1{font-size:clamp(1.8rem,4vw,3rem);color:#fff;margin-bottom:12px;max-width:640px}
+.page-hero h1 em{color:var(--gold);font-style:italic}
+.page-hero p{font-size:1rem;color:rgba(255,255,255,.6);max-width:520px;line-height:1.78}
+.hero-meta{display:flex;gap:32px;margin-top:32px;flex-wrap:wrap}
+.hero-meta-item{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.35)}
+.hero-meta-item span{display:block;font-size:1.4rem;font-family:var(--font-h);color:var(--gold);letter-spacing:0;text-transform:none;margin-bottom:2px}
+
+/* ── FILTER BAR ── */
+.filter-section{background:var(--white);border-bottom:1px solid var(--border);padding:20px 0;position:sticky;top:68px;z-index:800}
+.filter-inner{max-width:1160px;margin:0 auto;padding:0 24px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.filter-search{flex:1;min-width:220px;position:relative}
+.filter-search input{width:100%;padding:10px 16px 10px 40px;border:1.5px solid var(--border);border-radius:8px;font-family:var(--font-b);font-size:.88rem;color:var(--navy);background:var(--cream);outline:none;transition:border-color var(--t)}
+.filter-search input:focus{border-color:var(--gold);background:#fff}
+.filter-search::before{content:'🔍';position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:.85rem;pointer-events:none}
+.filter-select{padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:var(--font-b);font-size:.85rem;color:var(--navy);background:var(--cream);cursor:pointer;outline:none;transition:border-color var(--t)}
+.filter-select:focus{border-color:var(--gold)}
+.filter-count{font-size:.82rem;color:var(--muted);font-weight:600;white-space:nowrap;margin-left:auto}
+.filter-reset{font-size:.8rem;color:var(--gold);font-weight:700;cursor:pointer;background:none;border:none;font-family:var(--font-b);padding:4px 8px;border-radius:4px;transition:background var(--t)}
+.filter-reset:hover{background:rgba(229,168,24,.1)}
+
+/* ── TAGS ── */
+.tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:50px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.tag-phd{background:rgba(35,59,82,.1);color:var(--navy)}
+.tag-masters{background:rgba(50,88,121,.12);color:var(--steel)}
+.tag-postdoc{background:rgba(229,168,24,.15);color:#b07e00}
+.tag-mobility{background:rgba(40,160,100,.12);color:#1a6e44}
+.tag-research{background:rgba(150,80,200,.1);color:#7a3fa0}
+.tag-leadership{background:rgba(200,60,60,.1);color:#a03030}
+.tag-high{background:rgba(229,168,24,.2);color:#8a5e00;border:1px solid rgba(229,168,24,.4)}
+
+/* ── CALLS GRID ── */
+.calls-section{padding:40px 0 80px}
+.calls-container{max-width:1160px;margin:0 auto;padding:0 24px}
+.calls-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.no-results{text-align:center;padding:80px 24px;color:var(--muted)}
+.no-results h3{font-size:1.4rem;margin-bottom:8px;color:var(--navy)}
+
+/* ── CALL CARD ── */
+.call-card{background:var(--white);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;border:1px solid var(--border);transition:transform var(--t),box-shadow var(--t),border-color var(--t);cursor:pointer}
+.call-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(35,59,82,.1);border-color:var(--gold)}
+.call-top{background:var(--navy);padding:20px 20px 16px;position:relative}
+.call-top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;flex-wrap:wrap}
+.call-flag{font-size:1.2rem}
+.call-country-name{font-size:.72rem;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1.5px}
+.call-deadline-badge{font-size:.68rem;font-weight:700;background:rgba(229,168,24,.18);color:var(--gold);border:1px solid rgba(229,168,24,.35);border-radius:50px;padding:3px 9px;white-space:nowrap}
+.call-deadline-badge.urgent{background:rgba(220,50,50,.18);color:#e05555;border-color:rgba(220,50,50,.35)}
+.call-name{color:#fff;font-size:.95rem;line-height:1.35;font-family:var(--font-h);font-weight:600}
+.call-org{font-size:.72rem;color:rgba(255,255,255,.38);margin-top:6px;font-weight:500}
+.call-body{padding:16px 20px;flex:1;display:flex;flex-direction:column;gap:8px}
+.call-detail-row{display:flex;gap:8px;align-items:flex-start}
+.call-detail-key{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--navy);min-width:62px;padding-top:1px;flex-shrink:0}
+.call-detail-val{font-size:.82rem;color:var(--muted);line-height:1.5}
+.call-tags{display:flex;gap:6px;flex-wrap:wrap;padding:0 20px 12px}
+.call-foot{padding:0 20px 18px;display:flex;gap:8px}
+.btn-sm{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 16px;font-family:var(--font-b);font-size:.8rem;font-weight:600;border-radius:6px;border:1.5px solid transparent;cursor:pointer;transition:all var(--t);text-decoration:none;flex:1}
+.btn-sm-gold{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+.btn-sm-gold:hover{background:transparent;color:var(--gold)}
+.btn-sm-ghost{background:transparent;color:var(--steel);border-color:var(--border)}
+.btn-sm-ghost:hover{border-color:var(--navy);color:var(--navy)}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(20,30,39,.7);z-index:1000;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:#fff;border-radius:14px;max-width:680px;width:100%;max-height:88vh;overflow-y:auto;position:relative;transform:translateY(20px);transition:transform .25s}
+.modal-overlay.open .modal{transform:none}
+.modal-header{background:var(--navy);padding:28px 28px 22px;position:sticky;top:0;z-index:2}
+.modal-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.12);border:none;color:#fff;font-size:1.1rem;width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background var(--t)}
+.modal-close:hover{background:rgba(255,255,255,.22)}
+.modal-country{font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:8px}
+.modal-title{color:#fff;font-size:1.25rem;line-height:1.3;margin-bottom:6px}
+.modal-org{font-size:.8rem;color:rgba(255,255,255,.45)}
+.modal-body{padding:24px 28px}
+.modal-section{margin-bottom:22px}
+.modal-section h4{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--gold);margin-bottom:10px;font-family:var(--font-b)}
+.modal-row{display:flex;gap:12px;margin-bottom:8px;font-size:.88rem}
+.modal-row-key{font-weight:700;color:var(--navy);min-width:110px;flex-shrink:0;font-size:.82rem}
+.modal-row-val{color:var(--muted);line-height:1.55}
+.modal-foot{padding:0 28px 28px;display:flex;gap:10px;flex-wrap:wrap}
+.modal-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+
+/* ── FOOTER ── */
+.site-footer{background:var(--dark);color:rgba(255,255,255,.45);padding:36px 0 24px;text-align:center;font-size:.82rem}
+.site-footer a{color:var(--gold)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:960px){.calls-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){
+  nav.main-nav{display:none}
+  .calls-grid{grid-template-columns:1fr}
+  .filter-inner{flex-direction:column;align-items:stretch}
+  .filter-count{margin-left:0}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="3" fill="#E5A818"/>
+          <path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke="#E5A818" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <circle cx="12" cy="12" r="7" stroke="#E5A818" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+      Fellowship Hunter
+    </a>
+    <nav class="main-nav">
+      <a href="index.html">Home</a>
+      <a href="calls.html" class="active">Calls</a>
+      <a href="map.html">Map</a>
+      <a href="hunter-ai.html">Hunter AI</a>
+      <a href="advisory.html">Advisory</a>
+    </nav>
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('es')">ES</button>
+      <button class="lang-btn" onclick="setLang('pt')">PT</button>
+    </div>
+  </div>
+</header>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="page-hero-grid"></div>
+  <div class="page-hero-inner">
+    <div class="page-hero-tag">🎯 Global Database</div>
+    <h1>Every funded call. <em>Decoded.</em></h1>
+    <p>88 fully funded opportunities across 35+ countries — with real deadlines, real stipends, and the context to actually win them.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item"><span id="total-count">88</span>Total Calls</div>
+      <div class="hero-meta-item"><span>35+</span>Countries</div>
+      <div class="hero-meta-item"><span>6</span>Levels</div>
+      <div class="hero-meta-item"><span>100%</span>Fully Funded</div>
+    </div>
+  </div>
+</section>
+
+<!-- FILTERS -->
+<div class="filter-section">
+  <div class="filter-inner">
+    <div class="filter-search">
+      <input type="text" id="search-input" placeholder="Search by name, country, field…" oninput="applyFilters()">
+    </div>
+    <select class="filter-select" id="filter-country" onchange="applyFilters()">
+      <option value="">All Countries</option>
+    </select>
+    <select class="filter-select" id="filter-level" onchange="applyFilters()">
+      <option value="">All Levels</option>
+      <option value="Masters">Masters</option>
+      <option value="PhD">PhD</option>
+      <option value="Postdoc">Postdoc</option>
+      <option value="Investigación">Research</option>
+      <option value="Movilidad">Mobility</option>
+      <option value="Liderazgo">Leadership</option>
+    </select>
+    <select class="filter-select" id="filter-priority" onchange="applyFilters()">
+      <option value="">All Priorities</option>
+      <option value="ALTA">⭐ High Priority</option>
+      <option value="MEDIA">Medium Priority</option>
+    </select>
+    <span class="filter-count" id="filter-count">Showing 88 calls</span>
+    <button class="filter-reset" onclick="resetFilters()">Clear filters</button>
+  </div>
+</div>
+
+<!-- CALLS GRID -->
+<section class="calls-section">
+  <div class="calls-container">
+    <div class="calls-grid" id="calls-grid"></div>
+    <div class="no-results" id="no-results" style="display:none">
+      <h3>No calls match your filters</h3>
+      <p>Try adjusting your search or clearing the filters.</p>
+    </div>
+  </div>
+</section>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+      <div class="modal-country" id="m-country"></div>
+      <div class="modal-title" id="m-title"></div>
+      <div class="modal-org" id="m-org"></div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-tags" id="m-tags"></div>
+      <div class="modal-section">
+        <h4>Funding & Coverage</h4>
+        <div class="modal-row"><span class="modal-row-key">Stipend</span><span class="modal-row-val" id="m-stipend"></span></div>
+        <div class="modal-row"><span class="modal-row-key">Coverage</span><span class="modal-row-val" id="m-coverage"></span></div>
+      </div>
+      <div class="modal-section">
+        <h4>Fields & Eligibility</h4>
+        <div class="modal-row"><span class="modal-row-key">Fields</span><span class="modal-row-val" id="m-fields"></span></div>
+        <div class="modal-row"><span class="modal-row-key">Who</span><span class="modal-row-val" id="m-eligibility"></span></div>
+      </div>
+      <div class="modal-section">
+        <h4>Timeline</h4>
+        <div class="modal-row"><span class="modal-row-key">Opens</span><span class="modal-row-val" id="m-opens"></span></div>
+        <div class="modal-row"><span class="modal-row-key">Deadline</span><span class="modal-row-val" id="m-deadline"></span></div>
+        <div class="modal-row"><span class="modal-row-key">Frequency</span><span class="modal-row-val" id="m-frequency"></span></div>
+      </div>
+      <div class="modal-section" id="m-notes-section">
+        <h4>Strategic Notes</h4>
+        <div class="modal-row-val" id="m-notes" style="font-size:.88rem;color:var(--muted);line-height:1.7;padding:12px 16px;background:var(--cream);border-radius:8px;border-left:3px solid var(--gold)"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <a id="m-link" href="#" target="_blank" class="btn-sm btn-sm-gold">Visit Official Website →</a>
+      <a href="hunter-ai.html" class="btn-sm btn-sm-ghost">Get Advisory Help 🤖</a>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <p>© 2026 Fellowship Hunter · <a href="https://researchnetworkricai.org" target="_blank">In partnership with RICAI Research Network</a></p>
+</footer>
+
+<script>
+// ══════════════════════════════════
+// DATABASE — 88 calls
+// ══════════════════════════════════
+const CALLS = [
+  {id:"FH-G001",name:"Fulbright Foreign Student Program",country:"United States",flag:"🇺🇸",org:"U.S. Dept of State / IIE",type:"Government",level:"Masters · PhD",stipend:"~$30,000/yr",coverage:"Tuition + stipend + housing + insurance + flight",fields:"All disciplines",eligibility:"International · University degree · Advanced English",opens:"Sep 2026",deadline:"Oct–Dec 2026 (varies by country)",frequency:"Annual",website:"https://foreign.fulbrightonline.org",priority:"ALTA",notes:"One of the world's most prestigious. Deadline varies by country — check local embassy."},
+  {id:"FH-G002",name:"DAAD Study Scholarships for Foreign Graduates",country:"Germany",flag:"🇩🇪",org:"DAAD",type:"Government",level:"Masters",stipend:"€1,350/month",coverage:"Tuition + stipend + insurance + travel",fields:"All disciplines",eligibility:"Graduates · Max 6 yrs post-degree · Not EU/USA/CAN/AUS",opens:"May 2026",deadline:"Oct 15, 2026",frequency:"Annual",website:"https://www.daad.de/en",priority:"ALTA",notes:"Very relevant for LATAM. Study start: October 2027. Strong LATAM partnerships."},
+  {id:"FH-G003",name:"DAAD Research Grants for Doctoral Researchers",country:"Germany",flag:"🇩🇪",org:"DAAD",type:"Government",level:"PhD · Research",stipend:"€1,300–1,500/month",coverage:"Stipend + insurance + travel + family allowance",fields:"All disciplines",eligibility:"Master's degree · Research proposal required",opens:"May 2026",deadline:"Oct 15, 2026",frequency:"Annual",website:"https://www.daad.de/en",priority:"ALTA",notes:"Ideal for researchers with completed master's. DAAD actively encourages LATAM applications."},
+  {id:"FH-G004",name:"Chevening Scholarship",country:"United Kingdom",flag:"🇬🇧",org:"UK Foreign Commonwealth & Development Office",type:"Government",level:"Masters",stipend:"£1,516/month (London)",coverage:"Full tuition + stipend + flight + visa costs",fields:"All disciplines",eligibility:"2 yrs work experience · B2+ English · Return home after",opens:"Sep 2026",deadline:"Nov 4, 2026",frequency:"Annual",website:"https://www.chevening.org",priority:"ALTA",notes:"Requires 2-yr return to home country post-scholarship. Leadership focus."},
+  {id:"FH-G005",name:"Erasmus+ International Credit Mobility",country:"Multiple European Countries",flag:"🇪🇺",org:"European Commission",type:"Mobility",level:"Bachelor · Masters · PhD",stipend:"€800–1,200/month",coverage:"Monthly grant + insurance",fields:"All disciplines",eligibility:"Students enrolled in university with ICM agreement",opens:"Oct 2026",deadline:"Feb 2027",frequency:"Annual",website:"https://erasmus-plus.ec.europa.eu",priority:"ALTA",notes:"Apply through your home university's international office — they must have an ICM agreement with a European partner."},
+  {id:"FH-G006",name:"MSCA Doctoral Networks & Postdoctoral Fellowships",country:"Multiple European Countries",flag:"🇪🇺",org:"European Commission / Universities",type:"Research Fellowship",level:"PhD · Postdoc",stipend:"~€2,500–3,500/month",coverage:"Competitive salary + family allowance + mobility costs",fields:"All disciplines · STEM priority",eligibility:"PhD < 8 yrs post-PhD for Postdoctoral Fellowships",opens:"Various",deadline:"Various",frequency:"Annual",website:"https://marie-sklodowska-curie-actions.ec.europa.eu",priority:"ALTA",notes:"One of Europe's largest programs. International mobility required. Multiple universities involved."},
+  {id:"FH-G007",name:"Italian Government Scholarships MAECI",country:"Italy",flag:"🇮🇹",org:"Ministry of Foreign Affairs Italy",type:"Government",level:"Masters · PhD · Research",stipend:"€900/month",coverage:"€900/month + tuition waiver",fields:"All disciplines",eligibility:"International · University degree · No strict age limit",opens:"Jan 2027",deadline:"Mar 2027",frequency:"Annual",website:"https://www.esteri.it/en/opportunita/borse-di-studio/per-stranieri",priority:"ALTA",notes:"Different from IILA — this is directly from the Ministry of Foreign Affairs. Broader eligibility."},
+  {id:"FH-G008",name:"IILA-MAECI Scholarships for Latin Americans 2027",country:"Italy",flag:"🇮🇹",org:"IILA + MAECI Italy",type:"Research Internship",level:"Postgrad · Specialization",stipend:"€1,500/month",coverage:"€1,500/month + health insurance · 3–6 months",fields:"Agrifood · Biotech · Sustainability · Space Sciences · Cultural Heritage",eligibility:"LATAM citizens IILA member · Max 35 yrs · University degree",opens:"Jun 2026",deadline:"Sep 30, 2026",frequency:"Annual",website:"https://iila.org/es/convocatoria-becas-iila-maeci-dgcs/",priority:"ALTA",notes:"ACTIVE NOW — FH-L01. One of the most accessible for LATAM. Apply through iila.org."},
+  {id:"FH-G009",name:"Eiffel Excellence Scholarship Programme",country:"France",flag:"🇫🇷",org:"Campus France / MEAE",type:"Government",level:"Masters · PhD",stipend:"€1,181–1,400/month",coverage:"Stipend + cultural support + insurance",fields:"Engineering · Economics · Political Science · Law · Management",eligibility:"International · Proposed by French institution · <30 Masters / <35 PhD",opens:"Jan 2027",deadline:"Jan 2027",frequency:"Annual",website:"https://www.campusfrance.org/en/eiffel-scholarship-program-of-excellence",priority:"ALTA",notes:"The French institution nominates you — contact your target supervisor first, they apply on your behalf."},
+  {id:"FH-G010",name:"AECID Scholarships for Foreign Students",country:"Spain",flag:"🇪🇸",org:"AECID",type:"Government",level:"Masters · PhD · Research",stipend:"~€1,100/month",coverage:"Tuition + stipend + flight + insurance",fields:"Development · Cooperation · Social Sciences · STEM · Humanities",eligibility:"LATAM & Africa · University degree · Max 2 yrs in Spain",opens:"Oct 2026",deadline:"Dec 2026",frequency:"Annual",website:"https://www.aecid.es/becas",priority:"ALTA",notes:"Very LATAM-oriented. Strong emphasis on development and cooperation."},
+  {id:"FH-G011",name:"Alexander von Humboldt Research Fellowship",country:"Germany",flag:"🇩🇪",org:"Alexander von Humboldt Foundation",type:"Research Fellowship",level:"Postdoc · Senior Researchers",stipend:"€2,670–3,170/month",coverage:"Stipend + travel + family + German language course",fields:"All disciplines",eligibility:"PhD + publications · Invitation from German researcher",opens:"Rolling",deadline:"Rolling (3–4 months processing)",frequency:"Rolling",website:"https://www.humboldt-foundation.de/en/apply/sponsorship-programmes/humboldt-research-fellowship",priority:"ALTA",notes:"No fixed deadline — rolling applications. Among the most prestigious for researchers. Requires German host."},
+  {id:"FH-G012",name:"EMBO Long-Term Postdoctoral Fellowship",country:"Multiple European Countries",flag:"🇪🇺",org:"European Molecular Biology Organization",type:"Research Fellowship",level:"Postdoc",stipend:"~€2,500/month",coverage:"Stipend + relocation + family allowance",fields:"Life Sciences · Molecular Biology · Biochemistry",eligibility:"PhD + international mobility required · Cannot stay in same group",opens:"Jan 2027",deadline:"Feb 2027",frequency:"2 rounds/year",website:"https://www.embo.org/funding/fellowships-grants-and-career-support/postdoctoral-fellowships/",priority:"ALTA",notes:"Must change country. Very competitive. 2 calls/year (Feb and Aug)."},
+  {id:"FH-G013",name:"OAS-GCUB PAEC / GCUB-Mob Scholarships 2026",country:"Brazil",flag:"🇧🇷",org:"OAS + Coimbra Group Brazilian Universities",type:"Government/International",level:"Masters · PhD",stipend:"CAPES stipend + USD 1,200 bonus",coverage:"CAPES monthly stipend + USD 1,200 one-time bonus (first 150)",fields:"All disciplines at GCUB universities",eligibility:"OAS citizens (excl. Brazilians) · Bachelor's degree",opens:"2026",deadline:"Verify gcub.org.br",frequency:"Annual",website:"https://www.oas.org/en/scholarships/",priority:"ALTA",notes:"ACTIVE — FH-L03. USD 1,200 bonus only for first 150 selected. Portuguese minimum required before defense."},
+  {id:"FH-G014",name:"CAPES PEC-PG Scholarships",country:"Brazil",flag:"🇧🇷",org:"CAPES Brazil",type:"Government",level:"Masters · PhD",stipend:"BRL 2,013–2,200/month",coverage:"Stipend + insurance",fields:"All disciplines at Brazilian universities",eligibility:"Citizens of countries with bilateral agreement with Brazil · University degree",opens:"Aug 2026",deadline:"Oct 2026",frequency:"Annual",website:"https://www.gov.br/capes/pt-br",priority:"ALTA",notes:"Bilateral — verify if your country has agreement with Brazil. Very accessible for LATAM."},
+  {id:"FH-G015",name:"CNPq Research Fellowships Brazil",country:"Brazil",flag:"🇧🇷",org:"CNPq Brazil",type:"Research Fellowship",level:"Postdoc · Research",stipend:"~BRL 6,000–9,000/month",coverage:"Stipend + insurance + flight",fields:"STEM · Biological Sciences · Agronomy · Computing",eligibility:"PhD · Research proposal · Host institution in Brazil",opens:"Rolling",deadline:"Rolling",frequency:"Rolling",website:"https://www.gov.br/cnpq/pt-br",priority:"ALTA",notes:"Rolling — contact Brazilian host institution directly first."},
+  {id:"FH-G016",name:"CAPES-Humboldt Research Fellowship",country:"Germany",flag:"🇩🇪",org:"CAPES + Humboldt Foundation",type:"Research Fellowship",level:"Postdoc · Experienced Researchers",stipend:"€2,670–3,170/month",coverage:"Stipend + travel + family allowance",fields:"All disciplines",eligibility:"Brazilian researchers with PhD · German institution invitation",opens:"Rolling",deadline:"May 29, 2026 (recent round)",frequency:"2 rounds/year",website:"https://www.humboldt-foundation.de",priority:"ALTA",notes:"Exclusive for Brazilians. Combines CAPES + Humboldt funding."},
+  {id:"FH-G017",name:"MEXT Japanese Government Scholarship",country:"Japan",flag:"🇯🇵",org:"Ministry of Education Japan (MEXT)",type:"Government",level:"Bachelor · Masters · PhD",stipend:"¥143,000–145,000/month",coverage:"Tuition + stipend + flight + Japanese language training",fields:"All disciplines",eligibility:"International · No strict age limit",opens:"Apr 2026",deadline:"Jun 2026 (embassy track)",frequency:"Annual",website:"https://www.mext.go.jp/en",priority:"ALTA",notes:"No IELTS required. Long process: embassy Apr–Jun → university placement Oct–Nov → study starts Apr 2027."},
+  {id:"FH-G018",name:"Global Korea Scholarship (GKS)",country:"South Korea",flag:"🇰🇷",org:"Ministry of Education Korea / NIIED",type:"Government",level:"Masters · PhD",stipend:"KRW 1,000,000/month (~$750)",coverage:"Tuition + stipend + flight + insurance + Korean language",fields:"All disciplines",eligibility:"International · GPA ≥ 80% · No strict age limit",opens:"Feb 2027",deadline:"Apr 2027",frequency:"Annual",website:"https://www.studyinkorea.go.kr",priority:"ALTA",notes:"Includes 1 year of free Korean training. Embassy and University tracks available."},
+  {id:"FH-G019",name:"Chinese Government Scholarship (CSC)",country:"China",flag:"🇨🇳",org:"Chinese Scholarship Council (CSC)",type:"Government",level:"Bachelor · Masters · PhD",stipend:"¥2,500–3,500/month",coverage:"Tuition + stipend + housing + insurance",fields:"All disciplines at 280+ universities",eligibility:"International · No IELTS required in many programs",opens:"Jan 2027",deadline:"Mar 2027",frequency:"Annual",website:"https://www.csc.edu.cn/studyinchina",priority:"ALTA",notes:"One of the most accessible. No IELTS required for many programs. 280+ partner universities."},
+  {id:"FH-G020",name:"Schwarzman Scholars",country:"China",flag:"🇨🇳",org:"Schwarzman Foundation / Tsinghua University",type:"Leadership Fellowship",level:"Masters (1 year)",stipend:"~$2,000/month equivalent",coverage:"Full tuition + stipend + housing + flight + activities",fields:"All disciplines oriented to leadership and public policy",eligibility:"International · Demonstrated leadership · <30 years",opens:"Sep 2026",deadline:"Sep 2026",frequency:"Annual",website:"https://www.schwarzmanscholars.org",priority:"ALTA",notes:"The Rhodes equivalent for China. Very competitive. Strong leadership focus."},
+  {id:"FH-G021",name:"Rhodes Scholarship",country:"United Kingdom",flag:"🇬🇧",org:"Rhodes Trust / University of Oxford",type:"Prestige Fellowship",level:"Postgraduate at Oxford",stipend:"£20,000/year",coverage:"Full Oxford tuition + stipend + flight",fields:"All disciplines at Oxford",eligibility:"By country of origin · Academic excellence · Leadership",opens:"Jul 2026",deadline:"Aug–Oct 2026 (varies by country)",frequency:"Annual",website:"https://www.rhodeshouse.ox.ac.uk",priority:"ALTA",notes:"World's most prestigious scholarship. Requires nomination through your country's selection committee."},
+  {id:"FH-G022",name:"Gates Cambridge Scholarship",country:"United Kingdom",flag:"🇬🇧",org:"Gates Foundation / University of Cambridge",type:"Prestige Fellowship",level:"Masters · PhD · Postdoc",stipend:"~£22,000/year",coverage:"Full Cambridge tuition + stipend + flight + development",fields:"All disciplines at Cambridge",eligibility:"International (not UK) · Prior Cambridge admission required",opens:"Oct 2026",deadline:"Dec 2026",frequency:"Annual",website:"https://www.gatescambridge.org",priority:"ALTA",notes:"Apply to Cambridge first; if accepted, then apply to Gates. Among the most generous in the world."},
+  {id:"FH-G023",name:"Hubert H. Humphrey Fellowship Program",country:"United States",flag:"🇺🇸",org:"U.S. Department of State / IIE",type:"Leadership Fellowship",level:"Non-degree (10 months)",stipend:"Full coverage equivalent",coverage:"Tuition + stipend + flight + insurance + professional development",fields:"Public Policy · Health · Education · Environment · Economics · Technology",eligibility:"5+ yrs professional experience · Non-researchers without management · B2+ English",opens:"May 2026",deadline:"Sep 2026 (varies by country)",frequency:"Annual",website:"https://www.humphreyfellowship.org",priority:"ALTA",notes:"For mid-career professionals. Deadline varies by country — check local US Embassy."},
+  {id:"FH-G024",name:"Rotary Peace Fellowship",country:"Multiple Countries",flag:"🌐",org:"Rotary International",type:"Peace & Leadership",level:"Masters · Professional Certificate",stipend:"Full coverage",coverage:"Tuition + housing + travel + living",fields:"Peace · Conflict Resolution · Development · Diplomacy · Public Health",eligibility:"International · 3+ yrs work experience · B2+ English",opens:"Apr 2026",deadline:"May 15, 2026",frequency:"Annual",website:"https://www.rotary.org/en/our-programs/peace-fellowships",priority:"ALTA",notes:"Up to 170 fellowships/year. Partner universities in USA, UK, Japan, Australia, Sweden, Uganda."},
+  {id:"FH-G025",name:"Erasmus Mundus Joint Master Degrees",country:"Multiple European Countries",flag:"🇪🇺",org:"European Commission / University Consortia",type:"Masters Program",level:"Masters (1–2 years)",stipend:"€1,000/month",coverage:"Tuition + €1,000/month + travel + insurance",fields:"All disciplines by consortium",eligibility:"International · University degree · No age restriction",opens:"Oct 2026",deadline:"Jan 2027",frequency:"Annual",website:"https://eacea.ec.europa.eu",priority:"ALTA",notes:"Study in 2–3 European countries. Very competitive but very generous. Double or joint degree."},
+  {id:"FH-G026",name:"Commonwealth Scholarship",country:"United Kingdom",flag:"🇬🇧",org:"Commonwealth Scholarship Commission",type:"Government",level:"Masters · PhD",stipend:"~£2,000/month",coverage:"Tuition + stipend + flight + insurance",fields:"All disciplines",eligibility:"Commonwealth citizens · University degree · B2+ English",opens:"Aug 2026",deadline:"Oct 2026",frequency:"Annual",website:"https://cscuk.fcdo.gov.uk",priority:"ALTA",notes:"For Commonwealth country citizens. UK study."},
+  {id:"FH-G027",name:"Queen Elizabeth Commonwealth Scholarships",country:"Multiple Commonwealth Countries",flag:"🌐",org:"Association of Commonwealth Universities",type:"Mobility",level:"Masters (2 years)",stipend:"~$1,000/month",coverage:"Full coverage in low/middle-income Commonwealth countries",fields:"All disciplines",eligibility:"Commonwealth citizens · Study in another Commonwealth country",opens:"Jan 2027",deadline:"Jun 2027",frequency:"Annual",website:"https://qecs.acu.ac.uk",priority:"MEDIA",notes:"Study in a low or middle-income Commonwealth country. Unique mobility model."},
+  {id:"FH-G028",name:"Heinrich Böll Foundation Scholarships",country:"Germany",flag:"🇩🇪",org:"Heinrich Böll Foundation",type:"Foundation",level:"Masters · PhD",stipend:"€1,000–1,200/month",coverage:"Stipend + books allowance",fields:"Social Sciences · Humanities · Arts · STEM · Policy",eligibility:"International in Germany · Progressive values · Social commitment",opens:"Jan 2027",deadline:"Mar 1, 2027",frequency:"2 rounds/year",website:"https://www.boell.de/en/foundation/scholarship-programs",priority:"MEDIA",notes:"Progressive political foundation. Values social and environmental commitment."},
+  {id:"FH-G029",name:"Konrad Adenauer Foundation Scholarships",country:"Germany",flag:"🇩🇪",org:"Konrad Adenauer Foundation",type:"Foundation",level:"Masters · PhD",stipend:"€1,000–1,200/month",coverage:"Stipend + academic support",fields:"Political Science · Law · Economics · Social Sciences",eligibility:"Foreigners in Germany · Outstanding academic record",opens:"Jan 2027",deadline:"Mar 2027",frequency:"2 rounds/year",website:"https://www.kas.de/en",priority:"MEDIA",notes:"Conservative political foundation. Values leadership and public commitment."},
+  {id:"FH-G030",name:"Australia Awards Scholarships",country:"Australia",flag:"🇦🇺",org:"Australian Government (DFAT)",type:"Government",level:"Masters · PhD",stipend:"~AUD 2,500/month",coverage:"Tuition + stipend + flight + insurance + establishment",fields:"Development · STEM · Agriculture · Health · Governance",eligibility:"Citizens of eligible countries (mainly Asia-Pacific and Africa) · University degree",opens:"Apr 2026",deadline:"Jun 2026",frequency:"Annual",website:"https://www.australiaawards.gov.au",priority:"MEDIA",notes:"Mainly for Asia-Pacific and Africa. Verify eligibility by country."},
+  {id:"FH-G031",name:"Vanier Canada Graduate Scholarships",country:"Canada",flag:"🇨🇦",org:"Government of Canada",type:"Government",level:"PhD",stipend:"CAD 50,000/year",coverage:"CAD 50,000/year for 3 years",fields:"Health · Natural Sciences · Humanities & Social Sciences",eligibility:"International at Canadian universities · Academic excellence · Leadership",opens:"Aug 2026",deadline:"Nov 2026",frequency:"Annual",website:"https://vanier.gc.ca",priority:"ALTA",notes:"Extremely competitive. One of the world's best doctoral scholarships."},
+  {id:"FH-G032",name:"Mitacs Globalink Research Internship",country:"Canada",flag:"🇨🇦",org:"Mitacs / Canadian Universities",type:"Research Internship",level:"Bachelor · Early Masters (12 weeks)",stipend:"CAD 10,000 total",coverage:"CAD 10,000 stipend + flight + housing",fields:"All disciplines",eligibility:"Undergraduate and early Master's students · Eligible countries · GPA ≥ 3.5",opens:"Sep 2026",deadline:"Dec 2026",frequency:"Annual",website:"https://www.mitacs.ca/globalink",priority:"ALTA",notes:"Excellent for undergraduates. Many LATAM countries eligible."},
+  {id:"FH-G033",name:"OAS Academic Scholarships",country:"Multiple Americas",flag:"🌎",org:"Organization of American States (OAS)",type:"International",level:"Masters · PhD · Research",stipend:"~$1,000/month",coverage:"Tuition + partial stipend",fields:"Development · Social Sciences · Economics · Law · Health",eligibility:"OAS citizens · University degree",opens:"Aug 2026",deadline:"Oct 2026",frequency:"Annual",website:"https://www.oas.org/en/scholarships/",priority:"ALTA",notes:"For mobility within the Americas. Multiple modalities available."},
+  {id:"FH-G034",name:"Coimbra Group Scholarship for Early-Career Researchers from Latin America",country:"Multiple European Countries",flag:"🇪🇺",org:"Coimbra Group of Universities",type:"Research Mobility",level:"Early-Career Researchers (1–3 months)",stipend:"~€1,500/month",coverage:"Stay + insurance + travel support",fields:"All disciplines at Coimbra Group universities",eligibility:"LATAM researchers at higher education institutions · Early-career",opens:"Feb 2027",deadline:"Verify 2027 dates",frequency:"Annual",website:"https://www.coimbra-group.eu/scholarship-programmes/",priority:"ALTA",notes:"For early-career researchers from LATAM. Access to top European universities."},
+  {id:"FH-G035",name:"ETH Zurich Excellence Scholarship",country:"Switzerland",flag:"🇨🇭",org:"ETH Zurich",type:"University",level:"Masters",stipend:"CHF 12,000/semester",coverage:"Tuition waiver + CHF 12,000/semester stipend",fields:"STEM · Architecture · Mathematics · Natural Sciences",eligibility:"International admitted to ETH · GPA ≥ 90%",opens:"Dec 2026",deadline:"Dec 15, 2026",frequency:"Annual",website:"https://ethz.ch/en/studies/financial/scholarships/excellencescholarship.html",priority:"ALTA",notes:"Apply to ETH first, then scholarship. Highly competitive. Top 10 university worldwide."},
+  {id:"FH-G036",name:"ETH Zurich Postdoctoral Fellowship",country:"Switzerland",flag:"🇨🇭",org:"ETH Zurich",type:"Research Fellowship",level:"Postdoc (2 years)",stipend:"~CHF 6,500/month",coverage:"Full salary + insurance + research funds",fields:"All disciplines at ETH",eligibility:"Recent PhD (<2 yrs) · Must change research group · International mobility",opens:"Various",deadline:"Sep 1, 2026 (next round)",frequency:"2 rounds/year",website:"https://ethz.ch/en/research",priority:"ALTA",notes:"~25% success rate. Requires changing research group. World-class environment."},
+  {id:"FH-G037",name:"JSPS Postdoctoral Fellowships for Research in Japan",country:"Japan",flag:"🇯🇵",org:"Japan Society for the Promotion of Science",type:"Research Fellowship",level:"Postdoc (12–24 months)",stipend:"¥362,000/month",coverage:"Stipend + flight + insurance + establishment",fields:"Humanities · Social Sciences · Natural Sciences · Engineering · Medicine",eligibility:"PhD recent (<6 yrs) · Invitation letter from Japanese researcher",opens:"Sep 2026",deadline:"Oct 2026",frequency:"2 rounds/year",website:"https://www.jsps.go.jp/english/e-fellow/postdoctoral.html",priority:"ALTA",notes:"Must contact and obtain invitation from Japanese researcher BEFORE applying."},
+  {id:"FH-G038",name:"NWO Talent Programme (Veni)",country:"Netherlands",flag:"🇳🇱",org:"Netherlands Organisation for Scientific Research",type:"Research Grant",level:"Postdoc (3 years)",stipend:"~€4,500/month equivalent",coverage:"Up to €320,000 for 3-year personal research",fields:"All disciplines",eligibility:"PhD recent (<3 yrs) · Affiliation with Dutch institution",opens:"Jan 2027",deadline:"Jan 2027",frequency:"Annual",website:"https://www.nwo.nl/en/calls/nwo-talent-programme",priority:"MEDIA",notes:"Very generous research grant. Requires Dutch institutional affiliation."},
+  {id:"FH-G039",name:"Aga Khan Foundation International Scholarship",country:"Multiple Countries",flag:"🌐",org:"Aga Khan Foundation",type:"Foundation",level:"Masters",stipend:"~$1,200/month",coverage:"50% grant + 50% interest-free loan",fields:"All disciplines",eligibility:"Citizens of eligible countries · No access to other funding · Merit + need",opens:"Jan 2027",deadline:"Mar 2027",frequency:"Annual",website:"https://www.akdn.org",priority:"MEDIA",notes:"50% is repaid interest-free. Eligible LATAM countries include Colombia and others."},
+  {id:"FH-G040",name:"Wellcome Trust Research Fellowships",country:"United Kingdom · Global",flag:"🇬🇧",org:"Wellcome Trust",type:"Research Fellowship",level:"Postdoc · Early-Career · Senior",stipend:"~£3,500/month",coverage:"Salary + research costs + training",fields:"Biomedicine · Public Health · Life Sciences · Humanities in Health",eligibility:"International · PhD or medical degree · Research proposal",opens:"Various",deadline:"Various (rolling by program)",frequency:"Rolling / Annual",website:"https://wellcome.org/grant-funding/schemes",priority:"ALTA",notes:"Multiple programs. Very generous. Focus on global health."},
+  {id:"FH-G041",name:"Colfuturo Doctoral Scholarships",country:"Colombia + Global",flag:"🇨🇴",org:"Colfuturo / MinCiencias Colombia",type:"National Government",level:"Masters · PhD",stipend:"Up to USD 28,000/yr",coverage:"Up to USD 20,000 Masters / USD 28,000 PhD + forgivable credit",fields:"All disciplines · Priority STEM and strategic areas",eligibility:"Colombian citizens · University degree · International program admission",opens:"Jan 2027",deadline:"Feb 2027",frequency:"Annual",website:"https://www.colfuturo.org",priority:"ALTA",notes:"Exclusive for Colombians. Very important for FH Colombian audience."},
+  {id:"FH-G042",name:"MinCiencias Doctoral Scholarships Colombia",country:"Colombia + Global",flag:"🇨🇴",org:"MinCiencias Colombia",type:"National Government",level:"PhD",stipend:"~USD 1,800/month",coverage:"Tuition + monthly stipend + insurance",fields:"All disciplines with emphasis on science and technology",eligibility:"Colombian citizens · Doctoral program admission",opens:"Mar 2027",deadline:"May 2027",frequency:"Annual",website:"https://minciencias.gov.co/convocatorias/",priority:"ALTA",notes:"Exclusive for Colombians. Covers both national and international doctorates."},
+  {id:"FH-G043",name:"FAPESP Fellowships",country:"Brazil",flag:"🇧🇷",org:"São Paulo Research Foundation",type:"Research",level:"Masters · PhD · Postdoc",stipend:"BRL variable",coverage:"Stipend + contingency benefit",fields:"All disciplines",eligibility:"Linked to São Paulo research institution · Some international programs",opens:"Rolling",deadline:"Rolling",frequency:"Rolling",website:"https://fapesp.br/en/opportunities",priority:"ALTA",notes:"Mainly for São Paulo-based researchers. Some international programs."},
+  {id:"FH-G044",name:"Türkiye Scholarships",country:"Turkey",flag:"🇹🇷",org:"Republic of Turkey Presidency / YTB",type:"Government",level:"Bachelor · Masters · PhD",stipend:"TRY 800–1,600/month",coverage:"Tuition + stipend + housing + flight + insurance + Turkish course",fields:"All disciplines",eligibility:"International · No strict age limit · No IELTS for many programs",opens:"Jan 2027",deadline:"Feb 2027",frequency:"Annual",website:"https://www.turkiyeburslari.gov.tr/en",priority:"MEDIA",notes:"Very accessible. No language requirement. One of the world's most applied-to scholarships (180,000 applicants)."},
+  {id:"FH-G045",name:"Stipendium Hungaricum Scholarship",country:"Hungary",flag:"🇭🇺",org:"Hungarian Government / Tempus",type:"Government",level:"Bachelor · Masters · PhD",stipend:"HUF 43,700/month + HUF 40,000 housing",coverage:"Tuition + stipend + housing + insurance",fields:"All disciplines",eligibility:"Citizens of bilateral agreement countries · University degree",opens:"Oct 2026",deadline:"Jan 2027",frequency:"Annual",website:"https://stipendiumhungaricum.hu",priority:"MEDIA",notes:"LATAM countries with agreement — verify eligible country list. Growing program."},
+  // SPAIN
+  {id:"FH-ES001",name:"AUIP Scholarships for Master's in Spanish Universities",country:"Spain",flag:"🇪🇸",org:"AUIP + Spanish Universities (240 institutions)",type:"University Network",level:"Masters",stipend:"€1,500–2,500 partial",coverage:"Partial/full tuition + housing + meals (varies by university)",fields:"All disciplines at 240+ associated universities",eligibility:"LATAM graduates from AUIP universities · University degree · GPA ≥ 8/10 · <12 months in Spain",opens:"Jan 2027",deadline:"Mar–Jun 2027 (varies by university)",frequency:"Annual (2 rounds)",website:"https://auip.org/es/becas-auip",priority:"ALTA",notes:"~600 scholarships/year. FIRST apply to the university, THEN request scholarship. Apply at solicitudes.auip.org"},
+  {id:"FH-ES002",name:"AUIP Doctoral Scholarships in Spain",country:"Spain",flag:"🇪🇸",org:"AUIP + Spanish Universities",type:"PhD",level:"PhD",stipend:"Variable by university",coverage:"Tuition + monthly support + co-tutorship",fields:"All disciplines",eligibility:"LATAM graduates with Master's · AUIP universities · Doctoral proposal",opens:"Jan 2027",deadline:"Jun–Jul 2027",frequency:"Annual",website:"https://auip.org/es/becas-auip",priority:"ALTA",notes:"Covers doctorates at Murcia, Granada, Sevilla, Salamanca, Valencia, Santiago and more."},
+  {id:"FH-ES003",name:"AUIP-UV Master's Scholarships at Universitat de València",country:"Spain",flag:"🇪🇸",org:"AUIP + Universitat de València",type:"University",level:"Masters",stipend:"€2,500 total",coverage:"€1,500 on arrival + €1,000 in January · Housing at Colegio Mayor",fields:"82 available master's programs across all areas",eligibility:"LATAM AUIP graduates · GPA ≥ 8/10 · <12 months in Spain",opens:"Apr 2027",deadline:"Apr 2027 (~1 month window)",frequency:"Annual",website:"https://auip.org/es/becas-auip",priority:"ALTA",notes:"12 scholarships/year. Very short application window (~1 month). Apply at solicitudes.auip.org"},
+  {id:"FH-ES004",name:"AUIP-UPV Scholarships at Universitat Politècnica de València",country:"Spain",flag:"🇪🇸",org:"AUIP + Universitat Politècnica de València",type:"University",level:"Masters",stipend:"Tuition covered",coverage:"ECTS credits covered + housing at Colegio Mayor",fields:"Engineering · Technology · Architecture · Design · Telecommunications",eligibility:"Ibero-American graduates · Competitive GPA · AUIP universities",opens:"Mar 2027",deadline:"Apr 2027",frequency:"Annual",website:"https://www.upv.es/entidades/vic/convocatoria-beca-auip",priority:"ALTA",notes:"33 scholarships/year. STEM/Engineering profile. UPV = top technical university in Spain."},
+  {id:"FH-ES005",name:"AUIP-USC Scholarships at Universidad de Santiago de Compostela",country:"Spain",flag:"🇪🇸",org:"AUIP + Universidade de Santiago de Compostela",type:"University",level:"Masters",stipend:"Variable",coverage:"Tuition covered + financial support",fields:"54 available master's programs",eligibility:"LATAM AUIP graduates · GPA ≥ 8/10 (Spanish scale) · B2 language",opens:"Feb 2027",deadline:"Apr 2027",frequency:"Annual",website:"https://auip.org/es/becas-auip",priority:"ALTA",notes:"Strong in humanities, sciences, health. Galicia, Spain."},
+  {id:"FH-ES006",name:"AUIP-UGR Doctoral Scholarships in AI at Universidad de Granada",country:"Spain",flag:"🇪🇸",org:"AUIP + Universidad de Granada",type:"PhD - AI",level:"PhD",stipend:"~€1,200/month",coverage:"Tuition + stipend + co-tutorship with LATAM university",fields:"Artificial Intelligence · Computing · Mathematics · Data Science",eligibility:"LATAM AUIP graduates · AI research proposal · Prior scientific experience",opens:"Jan 2027",deadline:"Jan 2027 (very short window)",frequency:"Annual",website:"https://auip.org/es/becas-auip",priority:"ALTA",notes:"Only 7 scholarships. Highly specific to AI. Very competitive."},
+  {id:"FH-ES007",name:"JAE Intro CSIC — Research Initiation Fellowships",country:"Spain",flag:"🇪🇸",org:"CSIC — Spanish National Research Council",type:"Research Initiation",level:"Bachelor · Masters (5–7 months)",stipend:"€600/month",coverage:"€4,200 total (7 months) · 20h/week in-person",fields:"Life Sciences · Materials · Society · Artificial Intelligence (40 specific AI spots)",eligibility:"Bachelor/Masters students · GPA ≥ 7.5 · No PhD · International eligible",opens:"Mar 2027",deadline:"Apr 2027 (1 month window)",frequency:"Annual",website:"https://sede.csic.gob.es/tramites/programa-jae",priority:"ALTA",notes:"240 scholarships/year. Includes 40 specific AI scholarships. In-person at CSIC institutes."},
+  {id:"FH-ES008",name:"La Caixa Foundation Postgraduate Fellowships Abroad",country:"Global (Europe · USA · Asia)",flag:"🇪🇸",org:"Fundación La Caixa",type:"Foundation",level:"Masters · PhD · Pre-doctoral",stipend:"~€2,500/month",coverage:"Tuition + stipend + travel + insurance + visa",fields:"All disciplines · STEM · Social Sciences · Humanities",eligibility:"Spanish and Portuguese citizens only · Spanish/Portuguese degree (2017–2026)",opens:"Jan 2027",deadline:"Feb 2027",frequency:"Annual",website:"https://fundacionlacaixa.org/es/becas-posgrado-extranjero",priority:"MEDIA",notes:"100 scholarships. ONLY for Spanish and Portuguese citizens. One of the most generous in Spain."},
+  {id:"FH-ES009",name:"Fundación Carolina Scholarships",country:"Spain",flag:"🇪🇸",org:"Fundación Carolina",type:"Foundation",level:"Masters · PhD · Postdoctoral",stipend:"~€1,200/month",coverage:"Tuition + stipend + travel + insurance",fields:"All disciplines",eligibility:"Ibero-Americans and Africans linked to Spain · University degree",opens:"Oct 2026",deadline:"Dec 2026",frequency:"Annual",website:"https://www.fundacioncarolina.es/becas/",priority:"ALTA",notes:"Very relevant for LATAM in Spain. One of the best-known in the region."},
+  {id:"FH-ES010",name:"Santander Scholarships",country:"Spain · Global",flag:"🇪🇸",org:"Banco Santander / Santander Universities",type:"Foundation",level:"Masters · Research · Internship",stipend:"Variable",coverage:"Variable by program",fields:"All disciplines at Santander universities",eligibility:"Students at Santander partner universities · Academic merit",opens:"Rolling",deadline:"Rolling",frequency:"Rolling",website:"https://www.becas-santander.com",priority:"MEDIA",notes:"Multiple programs with different coverages. Verify specific program."},
+  // FRANCE
+  {id:"FH-FR001",name:"French Institute Scholarships for Latin Americans",country:"France",flag:"🇫🇷",org:"Institut Français / Campus France",type:"Government",level:"Masters · PhD · Research",stipend:"~€1,000/month",coverage:"Stipend + travel support + insurance",fields:"All disciplines",eligibility:"LATAM citizens · University degree · French level varies by program",opens:"Sep 2026",deadline:"Nov 2026",frequency:"Annual",website:"https://www.institutfrancais.com/en/grants-and-funding",priority:"ALTA",notes:"Many bilateral programs with LATAM countries — verify by country."},
+  {id:"FH-FR002",name:"Sciences Po Émile Boutmy Scholarship",country:"France",flag:"🇫🇷",org:"Sciences Po Paris",type:"University",level:"Masters",stipend:"Up to €14,000/year",coverage:"Up to €14,000/year tuition reduction",fields:"Political Science · International Relations · Economics · Sociology · History",eligibility:"International non-European · Admitted to Sciences Po · Financial need + merit",opens:"Dec 2026",deadline:"Mar 2027",frequency:"Annual",website:"https://www.sciencespo.fr",priority:"ALTA",notes:"For Sciences Po master's programs. Very competitive. Combines merit and need."},
+  // BELGIUM
+  {id:"FH-BE001",name:"VLIR-UOS ICP Connect Scholarships",country:"Belgium",flag:"🇧🇪",org:"VLIR-UOS / Flemish Universities",type:"Government",level:"Masters · Bachelor",stipend:"~€750/month",coverage:"Tuition + stipend + flight + insurance + establishment",fields:"Development · STEM · Health · Agriculture · Social Sciences",eligibility:"Citizens of developing countries (list includes LATAM) · <40 yrs · Not EU resident",opens:"Oct 2026",deadline:"Feb 2027",frequency:"Annual",website:"https://www.vliruos.be/en/scholarships/ict",priority:"ALTA",notes:"Exclusive for developing countries. LATAM very eligible. English programs in Flemish Belgium."},
+  {id:"FH-BE002",name:"KU Leuven IRO PhD Scholarships",country:"Belgium",flag:"🇧🇪",org:"KU Leuven / IRO",type:"University",level:"PhD (4 years)",stipend:"~€2,000/month",coverage:"Full salary + insurance + research",fields:"All disciplines at KU Leuven",eligibility:"International PhD candidates · KU Leuven supervisor acceptance",opens:"Rolling",deadline:"Rolling (contact supervisor)",frequency:"Rolling",website:"https://www.kuleuven.be/english/research/funding/iro-phd-scholarships",priority:"ALTA",notes:"Contact KU Leuven supervisor first. Top 100 university worldwide. Belgium."},
+  // SWEDEN
+  {id:"FH-SE001",name:"Swedish Institute Scholarships for Global Professionals (SISGP)",country:"Sweden",flag:"🇸🇪",org:"Swedish Institute (SI)",type:"Government",level:"Masters (1–2 years)",stipend:"SEK 11,000/month",coverage:"Tuition + SEK 11,000/month + travel + insurance",fields:"All disciplines in English at Swedish universities",eligibility:"Non-EU · University degree · 3,000 hrs work experience (2+ yrs) · B2 English",opens:"Feb 2027",deadline:"Feb 2027",frequency:"Annual",website:"https://si.se/en/apply/scholarships/swedish-institute-scholarships-for-global-professionals/",priority:"ALTA",notes:"Requires minimum 2 years of work experience. For leaders and professionals. Very competitive."},
+  {id:"FH-SE002",name:"Lund University Global Scholarship Programme",country:"Sweden",flag:"🇸🇪",org:"Lund University",type:"University",level:"Masters",stipend:"Tuition covered",coverage:"Full tuition waiver",fields:"All disciplines in English",eligibility:"Non-EU · Admitted to Lund · Academic merit",opens:"Oct 2026",deadline:"Jan 2027",frequency:"Annual",website:"https://www.lunduniversity.lu.se",priority:"MEDIA",notes:"Covers tuition only, not living costs. Combine with other sources. Top Swedish university."},
+  // NORWAY
+  {id:"FH-NO001",name:"Norway Government Scholarships / Quota Scheme",country:"Norway",flag:"🇳🇴",org:"Norwegian Government / Universities Norway",type:"Government",level:"Masters · PhD",stipend:"NOK 12,000/month",coverage:"Stipend + tuition + insurance + travel",fields:"All disciplines at Norwegian universities",eligibility:"Citizens of developing countries · Some LATAM countries eligible",opens:"Aug 2026",deadline:"Oct 2026",frequency:"Annual",website:"https://www.siu.no/en/quota-scheme",priority:"MEDIA",notes:"Verify LATAM eligible country list — not all included."},
+  // DENMARK
+  {id:"FH-DK001",name:"Danish Government Scholarships for Non-EU Students",country:"Denmark",flag:"🇩🇰",org:"Danish Universities / Ministry of Education",type:"University",level:"Masters · PhD",stipend:"~DKK 7,000/month",coverage:"Tuition waiver + partial stipend",fields:"All disciplines at Danish universities",eligibility:"Non-EU/EEA · Admitted to Danish university · Academic merit",opens:"Jan 2027",deadline:"Mar–Apr 2027",frequency:"Annual",website:"https://www.studyindenmark.dk",priority:"MEDIA",notes:"Apply directly with Danish university — they automatically assess eligibility."},
+  // FINLAND
+  {id:"FH-FI001",name:"Finland Government Scholarships",country:"Finland",flag:"🇫🇮",org:"CIMO / Finnish Government",type:"Government",level:"PhD · Postdoctoral Research",stipend:"~€1,500/month",coverage:"Monthly stipend + insurance",fields:"All disciplines",eligibility:"International · PhD or PhD candidate · Finnish institution invitation",opens:"Rolling",deadline:"Rolling (summer/autumn rounds)",frequency:"Rolling",website:"https://www.helsinki.fi/en",priority:"MEDIA",notes:"Requires Finnish institution contact first. Primarily for PhD and research."},
+  // NETHERLANDS
+  {id:"FH-NL001",name:"Holland Scholarship",country:"Netherlands",flag:"🇳🇱",org:"Dutch Government / Dutch Universities",type:"Government",level:"Masters",stipend:"€5,000 (one-time payment)",coverage:"€5,000 lump sum + partial tuition waiver at some universities",fields:"All disciplines at Dutch universities",eligibility:"Non-EU/EEA · Admitted to Dutch university · No prior studies in NL",opens:"Dec 2026",deadline:"Jan 2027",frequency:"Annual",website:"https://www.studyinholland.nl/scholarships/holland-scholarship",priority:"ALTA",notes:"€5,000 one-time payment at start. Combine with other sources. Many universities participate."},
+  {id:"FH-NL002",name:"Maastricht University High Potential Scholarship",country:"Netherlands",flag:"🇳🇱",org:"Maastricht University",type:"University",level:"Masters",stipend:"€12,000/year + tuition",coverage:"Full tuition + €12,000 stipend",fields:"All disciplines at Maastricht",eligibility:"Non-EU · Admitted to Maastricht · GPA ≥ 3.5",opens:"Dec 2026",deadline:"Feb 2027",frequency:"Annual",website:"https://www.maastrichtuniversity.nl",priority:"ALTA",notes:"One of the most generous in the Netherlands. Covers tuition + stipend."},
+  // PORTUGAL
+  {id:"FH-PT001",name:"FCT PhD Scholarships Portugal",country:"Portugal",flag:"🇵🇹",org:"Fundação para a Ciência e Tecnologia (FCT)",type:"Government",level:"PhD (4 years)",stipend:"€1,074/month",coverage:"Stipend + insurance + tuition",fields:"All disciplines at Portuguese universities",eligibility:"International · Doctoral proposal · No strict age limit",opens:"Jan 2027",deadline:"Mar 2027",frequency:"Annual",website:"https://www.fct.pt/apoios/bolsas/",priority:"ALTA",notes:"Very accessible for Portuguese speakers. Portugal growing as LATAM destination."},
+  {id:"FH-PT002",name:"Camões Instituto da Cooperação Scholarships",country:"Portugal",flag:"🇵🇹",org:"Camões - Instituto da Cooperação e da Língua",type:"Government",level:"Masters · PhD · Portuguese Language",stipend:"~€800/month",coverage:"Stipend + insurance + support",fields:"Lusophone studies · Culture · Language · Cooperation · All disciplines",eligibility:"CPLP member countries and others · University degree",opens:"Oct 2026",deadline:"Dec 2026",frequency:"Annual",website:"https://www.instituto-camoes.pt",priority:"ALTA",notes:"Ideal for Portuguese speakers. Brazil eligible."},
+  // SWITZERLAND
+  {id:"FH-CH001",name:"Swiss Government Excellence Scholarships (ESKAS)",country:"Switzerland",flag:"🇨🇭",org:"Swiss Federal Commission for Scholarships (ESKAS)",type:"Government",level:"Masters · PhD · Postdoctoral Research",stipend:"CHF 1,920/month",coverage:"CHF 1,920/month + insurance + housing + travel",fields:"All disciplines at Swiss universities",eligibility:"International · Bilateral agreement countries · University degree",opens:"Aug 2026",deadline:"Oct–Dec 2026 (varies by country)",frequency:"Annual",website:"https://www.sbfi.admin.ch/sbfi/en/home/education/scholarships-and-grants/swiss-government-excellence-scholarships.html",priority:"ALTA",notes:"Based on bilateral agreements. Verify if your country has agreement with Switzerland."},
+  // IRELAND
+  {id:"FH-IE001",name:"Government of Ireland International Education Scholarships",country:"Ireland",flag:"🇮🇪",org:"Irish Government / HEA",type:"Government",level:"Masters · PhD",stipend:"€10,000 total support",coverage:"€10,000 (does not cover full tuition)",fields:"All disciplines at Irish universities",eligibility:"Non-EU/EEA · Admitted to Irish university · Merit",opens:"Jan 2027",deadline:"Feb 2027",frequency:"Annual",website:"https://hea.ie",priority:"MEDIA",notes:"€10,000 partial aid. Does not cover everything. Combine with other sources."},
+  // ERC
+  {id:"FH-ERC001",name:"European Research Council (ERC) Starting Grant",country:"Multiple EU Countries",flag:"🇪🇺",org:"European Commission / ERC",type:"Research Grant",level:"Early-Career Researchers",stipend:"Up to €1.5M total",coverage:"Full project funding for 5 years",fields:"All disciplines (researcher defines topic — bottom-up)",eligibility:"PhD · Researcher at EU institution · <7 yrs post-PhD for Starting Grant",opens:"Various",deadline:"Various",frequency:"Annual",website:"https://erc.europa.eu/apply-grants/starting-grant",priority:"ALTA",notes:"Not a training grant — a research grant. ERC Starting Grant for <7 yrs post-PhD. One of Europe's most prestigious."},
+  // JAPAN
+  {id:"FH-JP001",name:"JSPS Postdoctoral Fellowships for Research in Japan",country:"Japan",flag:"🇯🇵",org:"Japan Society for the Promotion of Science",type:"Research Fellowship",level:"Postdoc (12–24 months)",stipend:"¥362,000/month (~$2,400)",coverage:"Stipend + flight + insurance + establishment",fields:"Humanities · Social Sciences · Natural Sciences · Engineering · Medicine",eligibility:"PhD recent (<6 yrs) · Invitation letter from Japanese researcher",opens:"Sep 2026",deadline:"Oct 2026",frequency:"2 rounds/year",website:"https://www.jsps.go.jp/english/e-fellow/postdoctoral.html",priority:"ALTA",notes:"Must contact and obtain invitation from Japanese researcher BEFORE applying."},
+  // SINGAPORE
+  {id:"FH-SG001",name:"A*STAR Graduate Scholarship Singapore",country:"Singapore",flag:"🇸🇬",org:"Agency for Science Technology and Research",type:"Government",level:"Masters · PhD",stipend:"SGD 3,200/month",coverage:"Tuition + SGD 3,200/month + laptop + insurance",fields:"STEM · Biomedical · Engineering · Computing · Nanotechnology",eligibility:"International · Upper Second Class Honours · English",opens:"Aug 2026",deadline:"Oct 2026",frequency:"Annual",website:"https://www.a-star.edu.sg/Scholarships",priority:"MEDIA",notes:"Singapore = science hub in Asia. Excellent for STEM. In English."},
+  // MEXICO
+  {id:"FH-MX001",name:"CONAHCYT Doctoral Scholarships Mexico",country:"Mexico",flag:"🇲🇽",org:"CONAHCYT Mexico",type:"Government",level:"Masters · PhD",stipend:"MXN 14,000–18,000/month",coverage:"Tuition + stipend + insurance",fields:"All disciplines at CONAHCYT institutions",eligibility:"Mexican citizens and foreigners in CONAHCYT programs",opens:"Feb 2027",deadline:"Apr 2027",frequency:"Annual",website:"https://conahcyt.mx/becas_posgrados/",priority:"ALTA",notes:"Covers both Mexican nationals and foreigners in CONAHCYT programs. LATAM eligible."},
+  // ARGENTINA
+  {id:"FH-AR001",name:"CONICET Doctoral Scholarships Argentina",country:"Argentina",flag:"🇦🇷",org:"CONICET Argentina",type:"Government",level:"PhD · Postdoc",stipend:"~USD 400/month equivalent",coverage:"Monthly stipend + insurance + social security",fields:"All disciplines at CONICET",eligibility:"International eligible · CONICET director + proposal · University degree",opens:"Mar 2027",deadline:"May 2027",frequency:"Annual",website:"https://www.conicet.gov.ar/convocatorias/",priority:"ALTA",notes:"Very relevant for LATAM ecosystem. Doctoral initiation and completion scholarships."},
+  // CHILE
+  {id:"FH-CL001",name:"ANID Doctoral and Postdoc Scholarships Chile",country:"Chile",flag:"🇨🇱",org:"ANID Chile",type:"Government",level:"PhD · Postdoc",stipend:"~USD 1,200/month equivalent",coverage:"Tuition + stipend + insurance + research costs",fields:"All disciplines",eligibility:"Chilean citizens and foreign residents in Chile · University degree",opens:"Jan 2027",deadline:"Mar 2027",frequency:"Annual",website:"https://anid.cl/concursos/",priority:"ALTA",notes:"Covers foreign residents in Chile. Excellent science system."},
+  // INDIA
+  {id:"FH-IN001",name:"ICCR Indian Government Scholarships",country:"India",flag:"🇮🇳",org:"Indian Council for Cultural Relations (ICCR)",type:"Government",level:"Masters · PhD",stipend:"INR 30,000–35,000/month",coverage:"Tuition + stipend + housing",fields:"All disciplines · Emphasis Indian culture · STEM",eligibility:"International · Bilateral agreement · <30 Masters / <45 PhD",opens:"Jan 2027",deadline:"Mar 2027",frequency:"Annual",website:"https://a2ascholarships.iccr.gov.in/",priority:"MEDIA",notes:"Bilateral quota by country. Many English programs."},
+  // SAUDI ARABIA
+  {id:"FH-SA001",name:"KAUST Fellowship",country:"Saudi Arabia",flag:"🇸🇦",org:"King Abdullah University of Science & Technology",type:"University",level:"Masters · PhD",stipend:"USD 30,000/year",coverage:"Tuition + USD 30,000/year + housing + insurance + relocation",fields:"STEM · Engineering · Mathematics · Computing · Environmental Sciences",eligibility:"International · Upper Second Class Honours · TOEFL 79 / IELTS 6.5",opens:"Sep 2026",deadline:"Jan 2027",frequency:"Annual",website:"https://admissions.kaust.edu.sa/en",priority:"ALTA",notes:"One of the world's most generous. World-class campus. Saudi Arabia."},
+  // SOUTH AFRICA
+  {id:"FH-ZA001",name:"NRF South Africa Postdoctoral Fellowships",country:"South Africa",flag:"🇿🇦",org:"National Research Foundation (NRF)",type:"Research Fellowship",level:"Postdoc · PhD",stipend:"ZAR 200,000/year",coverage:"Stipend + research costs",fields:"All disciplines at South African universities",eligibility:"PhD · International eligible · Research proposal",opens:"Jul 2026",deadline:"Aug 2026",frequency:"Annual",website:"https://www.nrf.ac.za",priority:"MEDIA",notes:"Gateway to African research. English. Low cost of living."}
+];
+
+// ══════════════════════════════════
+// INIT
+// ══════════════════════════════════
+let filtered = [...CALLS];
+
+function init() {
+  // Populate country filter
+  const countries = [...new Set(CALLS.map(c => c.country))].sort();
+  const sel = document.getElementById('filter-country');
+  countries.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c; o.textContent = c;
+    sel.appendChild(o);
+  });
+  renderCards(CALLS);
+}
+
+function getLevelTag(level) {
+  const l = level.toLowerCase();
+  if (l.includes('phd') || l.includes('doctoral')) return 'tag-phd';
+  if (l.includes('master')) return 'tag-masters';
+  if (l.includes('postdoc')) return 'tag-postdoc';
+  if (l.includes('mobil') || l.includes('intern')) return 'tag-mobility';
+  if (l.includes('research') || l.includes('investigaci')) return 'tag-research';
+  if (l.includes('leadership') || l.includes('lideraz')) return 'tag-leadership';
+  return 'tag-research';
+}
+
+function isUrgent(deadline) {
+  const dl = deadline.toLowerCase();
+  const urgentTerms = ['sep 30','oct','nov','aug','sep 2026','jul','jun 2026'];
+  return urgentTerms.some(t => dl.includes(t));
+}
+
+function renderCards(data) {
+  const grid = document.getElementById('calls-grid');
+  const noRes = document.getElementById('no-results');
+  document.getElementById('filter-count').textContent = `Showing ${data.length} of ${CALLS.length} calls`;
+  document.getElementById('total-count').textContent = CALLS.length;
+
+  if (data.length === 0) {
+    grid.innerHTML = '';
+    noRes.style.display = 'block';
+    return;
+  }
+  noRes.style.display = 'none';
+
+  grid.innerHTML = data.map((c, i) => `
+    <div class="call-card" onclick="openModal(${CALLS.indexOf(c)})">
+      <div class="call-top">
+        <div class="call-top-row">
+          <div>
+            <span class="call-flag">${c.flag}</span>
+            <span class="call-country-name">${c.country}</span>
+          </div>
+          <span class="call-deadline-badge ${isUrgent(c.deadline) ? 'urgent' : ''}">${c.deadline.length > 18 ? c.deadline.substring(0,18)+'…' : c.deadline}</span>
+        </div>
+        <div class="call-name">${c.name}</div>
+        <div class="call-org">${c.org}</div>
+      </div>
+      <div class="call-body">
+        <div class="call-detail-row">
+          <span class="call-detail-key">Funding</span>
+          <span class="call-detail-val">${c.stipend}</span>
+        </div>
+        <div class="call-detail-row">
+          <span class="call-detail-key">Level</span>
+          <span class="call-detail-val">${c.level}</span>
+        </div>
+        <div class="call-detail-row">
+          <span class="call-detail-key">Fields</span>
+          <span class="call-detail-val">${c.fields.length > 60 ? c.fields.substring(0,60)+'…' : c.fields}</span>
+        </div>
+      </div>
+      <div class="call-tags">
+        <span class="tag ${getLevelTag(c.level)}">${c.level.split('·')[0].trim()}</span>
+        ${c.priority === 'ALTA' ? '<span class="tag tag-high">⭐ High Priority</span>' : ''}
+      </div>
+      <div class="call-foot">
+        <button class="btn-sm btn-sm-gold" onclick="event.stopPropagation();openModal(${CALLS.indexOf(c)})">View Details</button>
+        <a class="btn-sm btn-sm-ghost" href="${c.website}" target="_blank" onclick="event.stopPropagation()">Official Site</a>
+      </div>
+    </div>
+  `).join('');
+}
+
+function applyFilters() {
+  const search = document.getElementById('search-input').value.toLowerCase();
+  const country = document.getElementById('filter-country').value;
+  const level = document.getElementById('filter-level').value;
+  const priority = document.getElementById('filter-priority').value;
+
+  filtered = CALLS.filter(c => {
+    const matchSearch = !search ||
+      c.name.toLowerCase().includes(search) ||
+      c.country.toLowerCase().includes(search) ||
+      c.fields.toLowerCase().includes(search) ||
+      c.org.toLowerCase().includes(search);
+    const matchCountry = !country || c.country === country;
+    const matchLevel = !level || c.level.toLowerCase().includes(level.toLowerCase());
+    const matchPriority = !priority || c.priority === priority;
+    return matchSearch && matchCountry && matchLevel && matchPriority;
+  });
+  renderCards(filtered);
+}
+
+function resetFilters() {
+  document.getElementById('search-input').value = '';
+  document.getElementById('filter-country').value = '';
+  document.getElementById('filter-level').value = '';
+  document.getElementById('filter-priority').value = '';
+  renderCards(CALLS);
+}
+
+// ══════════════════════════════════
+// MODAL
+// ══════════════════════════════════
+function openModal(idx) {
+  const c = CALLS[idx];
+  document.getElementById('m-country').textContent = `${c.flag} ${c.country} · ${c.id}`;
+  document.getElementById('m-title').textContent = c.name;
+  document.getElementById('m-org').textContent = c.org;
+  document.getElementById('m-stipend').textContent = c.stipend;
+  document.getElementById('m-coverage').textContent = c.coverage;
+  document.getElementById('m-fields').textContent = c.fields;
+  document.getElementById('m-eligibility').textContent = c.eligibility;
+  document.getElementById('m-opens').textContent = c.opens;
+  document.getElementById('m-deadline').textContent = c.deadline;
+  document.getElementById('m-frequency').textContent = c.frequency;
+  document.getElementById('m-notes').textContent = c.notes;
+  document.getElementById('m-link').href = c.website;
+  document.getElementById('m-tags').innerHTML = `
+    <span class="tag ${getLevelTag(c.level)}">${c.level}</span>
+    ${c.priority === 'ALTA' ? '<span class="tag tag-high">⭐ High Priority</span>' : '<span class="tag tag-research">Medium Priority</span>'}
+    <span class="tag tag-mobility">${c.type}</span>
+  `;
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModalDirect();
+}
+function closeModalDirect() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModalDirect(); });
+
+// ══════════════════════════════════
+// i18n (basic)
+// ══════════════════════════════════
+function setLang(lang) {
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.toLowerCase() === lang);
+  });
+}
+
+init();
+</script>
+</body>
+</html>
