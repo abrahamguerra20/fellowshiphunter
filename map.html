@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Global Map | Fellowship Hunter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+:root{--navy:#233B52;--steel:#325879;--gold:#E5A818;--cream:#F0EBE3;--white:#fff;--dark:#141E27;--muted:#5A7080;--border:rgba(35,59,82,0.1);--font-h:'Lora',serif;--font-b:'Work Sans',sans-serif;--t:0.22s}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--font-b);background:var(--dark);color:var(--navy);-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+
+/* HEADER */
+header{position:sticky;top:0;z-index:1000;background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:68px;max-width:1160px;margin:0 auto;padding:0 24px;gap:20px}
+.logo{font-family:var(--font-h);font-weight:700;font-size:1.2rem;color:var(--navy);display:flex;align-items:center;gap:10px}
+.logo-mark{width:32px;height:32px;background:var(--navy);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.logo-mark svg{width:16px;height:16px}
+nav.main-nav{display:flex;gap:2px}
+nav.main-nav a{font-size:.85rem;font-weight:500;color:var(--steel);padding:6px 12px;border-radius:4px;transition:color var(--t),background var(--t)}
+nav.main-nav a:hover{color:var(--navy);background:var(--cream)}
+nav.main-nav a.active{font-weight:700;color:var(--gold);background:var(--cream)}
+.lang-toggle{display:flex;gap:2px;border:1px solid var(--border);border-radius:6px;padding:3px;background:var(--cream)}
+.lang-btn{background:none;border:none;font-family:var(--font-b);font-size:.76rem;font-weight:700;color:var(--muted);cursor:pointer;padding:4px 9px;border-radius:4px;transition:all var(--t)}
+.lang-btn.active{background:var(--navy);color:#fff}
+
+/* MAP LAYOUT */
+.map-layout{display:flex;height:calc(100vh - 68px)}
+
+/* SIDEBAR */
+.sidebar{width:360px;flex-shrink:0;background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;z-index:500}
+.sidebar-header{padding:20px 20px 14px;border-bottom:1px solid var(--border);background:var(--navy)}
+.sidebar-title{font-family:var(--font-h);font-size:1.1rem;color:#fff;margin-bottom:6px}
+.sidebar-sub{font-size:.78rem;color:rgba(255,255,255,.45)}
+.sidebar-search{padding:14px 16px;border-bottom:1px solid var(--border);position:relative}
+.sidebar-search input{width:100%;padding:9px 14px 9px 36px;border:1.5px solid var(--border);border-radius:8px;font-family:var(--font-b);font-size:.84rem;color:var(--navy);background:var(--cream);outline:none;transition:border-color var(--t)}
+.sidebar-search input:focus{border-color:var(--gold);background:#fff}
+.sidebar-search::before{content:'🔍';position:absolute;left:28px;top:50%;transform:translateY(-50%);font-size:.8rem;pointer-events:none}
+.sidebar-filters{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap}
+.filter-chip{padding:5px 12px;border-radius:50px;border:1.5px solid var(--border);font-size:.72rem;font-weight:700;cursor:pointer;transition:all var(--t);background:var(--white);color:var(--muted);font-family:var(--font-b)}
+.filter-chip.active{border-color:var(--gold);background:rgba(229,168,24,.12);color:var(--navy)}
+.sidebar-count{padding:8px 16px;font-size:.75rem;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)}
+.sidebar-list{overflow-y:auto;flex:1}
+.sidebar-item{padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background var(--t)}
+.sidebar-item:hover{background:var(--cream)}
+.sidebar-item.selected{background:rgba(229,168,24,.08);border-left:3px solid var(--gold)}
+.sidebar-item-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px}
+.sidebar-item-name{font-size:.88rem;font-weight:600;color:var(--navy);line-height:1.3;font-family:var(--font-h)}
+.sidebar-item-flag{font-size:1.1rem;flex-shrink:0}
+.sidebar-item-org{font-size:.72rem;color:var(--muted);margin-bottom:6px}
+.sidebar-item-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tag-xs{display:inline-flex;padding:2px 8px;border-radius:50px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.tag-phd-xs{background:rgba(35,59,82,.1);color:var(--navy)}
+.tag-masters-xs{background:rgba(50,88,121,.12);color:var(--steel)}
+.tag-postdoc-xs{background:rgba(229,168,24,.15);color:#8a6000}
+.tag-other-xs{background:rgba(100,100,200,.1);color:#5050a0}
+.sidebar-item-deadline{font-size:.7rem;color:var(--muted);margin-left:auto}
+
+/* MAP */
+#map{flex:1;z-index:100}
+
+/* DETAIL PANEL */
+.detail-panel{position:absolute;bottom:24px;right:24px;width:340px;background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(20,30,39,.25);z-index:600;overflow:hidden;transform:translateY(20px);opacity:0;pointer-events:none;transition:all .25s}
+.detail-panel.open{transform:none;opacity:1;pointer-events:all}
+.detail-header{background:var(--navy);padding:18px 20px}
+.detail-close{float:right;background:rgba(255,255,255,.12);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center;transition:background var(--t)}
+.detail-close:hover{background:rgba(255,255,255,.22)}
+.detail-flag{font-size:1.4rem;margin-bottom:6px}
+.detail-name{font-family:var(--font-h);font-size:.95rem;color:#fff;line-height:1.3;margin-bottom:4px}
+.detail-org{font-size:.72rem;color:rgba(255,255,255,.45)}
+.detail-body{padding:16px 20px}
+.detail-row{display:flex;gap:8px;margin-bottom:8px;font-size:.82rem}
+.detail-key{font-weight:700;color:var(--navy);min-width:72px;font-size:.74rem;text-transform:uppercase;letter-spacing:.3px;padding-top:1px;flex-shrink:0}
+.detail-val{color:var(--muted);line-height:1.5}
+.detail-foot{padding:0 20px 18px;display:flex;gap:8px}
+.btn-detail{display:inline-flex;align-items:center;justify-content:center;padding:9px 16px;border-radius:6px;font-size:.8rem;font-weight:600;font-family:var(--font-b);border:1.5px solid transparent;cursor:pointer;transition:all var(--t);text-decoration:none;flex:1}
+.btn-detail-gold{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+.btn-detail-gold:hover{background:transparent;color:var(--gold)}
+.btn-detail-ghost{background:transparent;color:var(--steel);border-color:var(--border)}
+.btn-detail-ghost:hover{border-color:var(--navy);color:var(--navy)}
+
+/* LEGEND */
+.map-legend{position:absolute;top:84px;right:16px;background:rgba(255,255,255,.96);border-radius:10px;padding:14px 16px;z-index:600;box-shadow:0 4px 16px rgba(20,30,39,.12);border:1px solid var(--border)}
+.legend-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px;font-family:var(--font-b)}
+.legend-item{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:.75rem;color:var(--navy);font-weight:500}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* RESPONSIVE */
+@media(max-width:860px){
+  .sidebar{width:280px}
+  .detail-panel{right:12px;bottom:12px;width:300px}
+}
+@media(max-width:640px){
+  nav.main-nav{display:none}
+  .map-layout{flex-direction:column}
+  .sidebar{width:100%;height:280px;border-right:none;border-bottom:1px solid var(--border)}
+  #map{flex:1;min-height:200px}
+  .detail-panel{width:calc(100% - 24px);right:12px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="3" fill="#E5A818"/>
+          <path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke="#E5A818" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <circle cx="12" cy="12" r="7" stroke="#E5A818" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+      Fellowship Hunter
+    </a>
+    <nav class="main-nav">
+      <a href="index.html">Home</a>
+      <a href="calls.html">Calls</a>
+      <a href="map.html" class="active">Map</a>
+      <a href="hunter-ai.html">Hunter AI</a>
+      <a href="advisory.html">Advisory</a>
+    </nav>
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('es')">ES</button>
+      <button class="lang-btn" onclick="setLang('pt')">PT</button>
+    </div>
+  </div>
+</header>
+
+<div class="map-layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-title">🗺️ Global Fellowship Map</div>
+      <div class="sidebar-sub" id="sidebar-sub">88 funded opportunities · 35+ countries</div>
+    </div>
+    <div class="sidebar-search">
+      <input type="text" id="sidebar-search" placeholder="Search calls…" oninput="filterSidebar()">
+    </div>
+    <div class="sidebar-filters">
+      <button class="filter-chip active" data-level="" onclick="setLevel(this,'')">All</button>
+      <button class="filter-chip" data-level="PhD" onclick="setLevel(this,'PhD')">PhD</button>
+      <button class="filter-chip" data-level="Masters" onclick="setLevel(this,'Masters')">Masters</button>
+      <button class="filter-chip" data-level="Postdoc" onclick="setLevel(this,'Postdoc')">Postdoc</button>
+      <button class="filter-chip" data-level="Research" onclick="setLevel(this,'Research')">Research</button>
+    </div>
+    <div class="sidebar-count" id="sidebar-count">Showing 88 calls</div>
+    <div class="sidebar-list" id="sidebar-list"></div>
+  </div>
+
+  <!-- MAP -->
+  <div id="map"></div>
+
+  <!-- LEGEND -->
+  <div class="map-legend">
+    <div class="legend-title">Level</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#233B52"></span>PhD</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#325879"></span>Masters</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#E5A818"></span>Postdoc</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#5a9e6f"></span>Research</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#9b7fd4"></span>Other</div>
+  </div>
+
+  <!-- DETAIL PANEL -->
+  <div class="detail-panel" id="detail-panel">
+    <div class="detail-header">
+      <button class="detail-close" onclick="closeDetail()">✕</button>
+      <div class="detail-flag" id="d-flag"></div>
+      <div class="detail-name" id="d-name"></div>
+      <div class="detail-org" id="d-org"></div>
+    </div>
+    <div class="detail-body">
+      <div class="detail-row"><span class="detail-key">Funding</span><span class="detail-val" id="d-stipend"></span></div>
+      <div class="detail-row"><span class="detail-key">Level</span><span class="detail-val" id="d-level"></span></div>
+      <div class="detail-row"><span class="detail-key">Deadline</span><span class="detail-val" id="d-deadline"></span></div>
+      <div class="detail-row"><span class="detail-key">Fields</span><span class="detail-val" id="d-fields"></span></div>
+    </div>
+    <div class="detail-foot">
+      <a id="d-link" href="#" target="_blank" class="btn-detail btn-detail-gold">Official Site →</a>
+      <a href="calls.html" class="btn-detail btn-detail-ghost">All Details</a>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ══ COUNTRY COORDINATES ══
+const COORDS = {
+  "United States":[37.09,-95.71],"Germany":[51.16,10.45],"United Kingdom":[55.37,-3.43],
+  "Multiple European Countries":[50.0,15.0],"Italy":[42.83,12.83],"France":[46.22,2.21],
+  "Spain":[40.46,-3.74],"Belgium":[50.50,4.46],"Sweden":[60.12,18.64],"Norway":[60.47,8.46],
+  "Denmark":[56.26,9.50],"Finland":[61.92,25.74],"Netherlands":[52.13,5.29],
+  "Portugal":[39.39,-8.22],"Switzerland":[46.81,8.22],"Austria":[47.51,14.55],
+  "Poland":[51.91,19.14],"Czech Republic":[49.81,15.47],"Ireland":[53.41,-8.24],
+  "Greece":[39.07,21.82],"Hungary":[47.16,19.50],"Multiple EU Countries":[51.5,10.0],
+  "Brazil":[[-14.23,-51.92]],"Colombia":[4.57,-74.29],"Mexico":[23.63,-102.55],
+  "Argentina":[-38.41,-63.61],"Chile":[-35.67,-71.54],
+  "Japan":[36.20,138.25],"China":[35.86,104.19],"South Korea":[35.90,127.76],
+  "Singapore":[1.35,103.82],"India":[20.59,78.96],"Saudi Arabia":[23.88,45.07],
+  "South Africa":[-30.55,22.93],"Australia":[-25.27,133.77],"Canada":[56.13,-106.34],
+  "Multiple Countries":[20.0,0.0],"Multiple Americas":[15.0,-85.0],
+  "Global (Europe · USA · Asia)":[30.0,30.0],"Colombia + Global":[4.57,-74.29],
+  "Multiple Commonwealth Countries":[20.0,30.0],"Brazil + Global":[-14.23,-51.92],
+  "United Kingdom · Global":[55.37,-3.43],"Turkey":[38.96,35.24]
+};
+
+const LEVEL_COLORS = {
+  phd:'#233B52', masters:'#325879', postdoc:'#E5A818',
+  research:'#5a9e6f', mobility:'#e07a5f', other:'#9b7fd4'
+};
+
+function getLevelColor(level) {
+  const l = level.toLowerCase();
+  if(l.includes('phd')||l.includes('doctoral')) return LEVEL_COLORS.phd;
+  if(l.includes('master')) return LEVEL_COLORS.masters;
+  if(l.includes('postdoc')) return LEVEL_COLORS.postdoc;
+  if(l.includes('research')||l.includes('investigaci')) return LEVEL_COLORS.research;
+  if(l.includes('mobil')||l.includes('intern')) return LEVEL_COLORS.mobility;
+  return LEVEL_COLORS.other;
+}
+
+function getLevelClass(level) {
+  const l = level.toLowerCase();
+  if(l.includes('phd')||l.includes('doctoral')) return 'tag-phd-xs';
+  if(l.includes('master')) return 'tag-masters-xs';
+  if(l.includes('postdoc')) return 'tag-postdoc-xs';
+  return 'tag-other-xs';
+}
+
+// ══ DATA ══ (same as calls.html — key fields only for map)
+const CALLS = [
+  {id:"FH-G001",name:"Fulbright Foreign Student Program",country:"United States",flag:"🇺🇸",org:"U.S. Dept of State",level:"Masters · PhD",stipend:"~$30,000/yr",deadline:"Oct–Dec 2026",fields:"All disciplines",website:"https://foreign.fulbrightonline.org"},
+  {id:"FH-G002",name:"DAAD Study Scholarships",country:"Germany",flag:"🇩🇪",org:"DAAD",level:"Masters",stipend:"€1,350/month",deadline:"Oct 15, 2026",fields:"All disciplines",website:"https://www.daad.de/en"},
+  {id:"FH-G003",name:"DAAD Research Grants - PhD",country:"Germany",flag:"🇩🇪",org:"DAAD",level:"PhD",stipend:"€1,300–1,500/month",deadline:"Oct 15, 2026",fields:"All disciplines",website:"https://www.daad.de/en"},
+  {id:"FH-G004",name:"Chevening Scholarship",country:"United Kingdom",flag:"🇬🇧",org:"UK FCDO",level:"Masters",stipend:"£1,516/month",deadline:"Nov 4, 2026",fields:"All disciplines",website:"https://www.chevening.org"},
+  {id:"FH-G005",name:"Erasmus+ International Credit Mobility",country:"Multiple European Countries",flag:"🇪🇺",org:"European Commission",level:"Mobility",stipend:"€800–1,200/month",deadline:"Feb 2027",fields:"All disciplines",website:"https://erasmus-plus.ec.europa.eu"},
+  {id:"FH-G006",name:"MSCA Doctoral & Postdoctoral Fellowships",country:"Multiple European Countries",flag:"🇪🇺",org:"European Commission",level:"PhD · Postdoc",stipend:"€2,500–3,500/month",deadline:"Various",fields:"All disciplines",website:"https://marie-sklodowska-curie-actions.ec.europa.eu"},
+  {id:"FH-G007",name:"Italian Government Scholarships MAECI",country:"Italy",flag:"🇮🇹",org:"MAECI Italy",level:"Masters · PhD",stipend:"€900/month",deadline:"Mar 2027",fields:"All disciplines",website:"https://www.esteri.it"},
+  {id:"FH-G008",name:"IILA-MAECI Scholarships for Latin Americans 2027",country:"Italy",flag:"🇮🇹",org:"IILA + MAECI",level:"Research",stipend:"€1,500/month",deadline:"Sep 30, 2026",fields:"Agrifood · Biotech · Sustainability",website:"https://iila.org"},
+  {id:"FH-G009",name:"Eiffel Excellence Scholarship",country:"France",flag:"🇫🇷",org:"Campus France",level:"Masters · PhD",stipend:"€1,181–1,400/month",deadline:"Jan 2027",fields:"Engineering · Economics · Law",website:"https://www.campusfrance.org"},
+  {id:"FH-G010",name:"AECID Scholarships",country:"Spain",flag:"🇪🇸",org:"AECID",level:"Masters · PhD",stipend:"€1,100/month",deadline:"Dec 2026",fields:"Development · STEM",website:"https://www.aecid.es/becas"},
+  {id:"FH-G011",name:"Humboldt Research Fellowship",country:"Germany",flag:"🇩🇪",org:"Humboldt Foundation",level:"Postdoc",stipend:"€2,670–3,170/month",deadline:"Rolling",fields:"All disciplines",website:"https://www.humboldt-foundation.de"},
+  {id:"FH-G012",name:"EMBO Long-Term Postdoctoral Fellowship",country:"Multiple European Countries",flag:"🇪🇺",org:"EMBO",level:"Postdoc",stipend:"€2,500/month",deadline:"Feb 2027",fields:"Life Sciences",website:"https://www.embo.org"},
+  {id:"FH-G013",name:"OAS-GCUB PAEC Scholarships",country:"Brazil",flag:"🇧🇷",org:"OAS + GCUB",level:"Masters · PhD",stipend:"CAPES + USD 1,200",deadline:"Verify 2026",fields:"All disciplines",website:"https://www.oas.org/en/scholarships/"},
+  {id:"FH-G014",name:"CAPES PEC-PG Scholarships",country:"Brazil",flag:"🇧🇷",org:"CAPES Brazil",level:"Masters · PhD",stipend:"BRL 2,013–2,200/month",deadline:"Oct 2026",fields:"All disciplines",website:"https://www.gov.br/capes"},
+  {id:"FH-G017",name:"MEXT Japanese Government Scholarship",country:"Japan",flag:"🇯🇵",org:"MEXT Japan",level:"Bachelor · Masters · PhD",stipend:"¥143,000/month",deadline:"Jun 2026",fields:"All disciplines",website:"https://www.mext.go.jp/en"},
+  {id:"FH-G018",name:"Global Korea Scholarship (GKS)",country:"South Korea",flag:"🇰🇷",org:"NIIED Korea",level:"Masters · PhD",stipend:"KRW 1,000,000/month",deadline:"Apr 2027",fields:"All disciplines",website:"https://www.studyinkorea.go.kr"},
+  {id:"FH-G019",name:"Chinese Government Scholarship (CSC)",country:"China",flag:"🇨🇳",org:"CSC China",level:"Bachelor · Masters · PhD",stipend:"¥2,500–3,500/month",deadline:"Mar 2027",fields:"All disciplines",website:"https://www.csc.edu.cn"},
+  {id:"FH-G020",name:"Schwarzman Scholars",country:"China",flag:"🇨🇳",org:"Schwarzman Foundation / Tsinghua",level:"Masters",stipend:"Full coverage",deadline:"Sep 2026",fields:"Leadership · Policy",website:"https://www.schwarzmanscholars.org"},
+  {id:"FH-G021",name:"Rhodes Scholarship",country:"United Kingdom",flag:"🇬🇧",org:"Rhodes Trust / Oxford",level:"Postgraduate Oxford",stipend:"£20,000/year",deadline:"Aug–Oct 2026",fields:"All at Oxford",website:"https://www.rhodeshouse.ox.ac.uk"},
+  {id:"FH-G022",name:"Gates Cambridge Scholarship",country:"United Kingdom",flag:"🇬🇧",org:"Gates Foundation / Cambridge",level:"Masters · PhD",stipend:"~£22,000/year",deadline:"Dec 2026",fields:"All at Cambridge",website:"https://www.gatescambridge.org"},
+  {id:"FH-G023",name:"Hubert H. Humphrey Fellowship",country:"United States",flag:"🇺🇸",org:"U.S. Dept of State",level:"Professional (10 months)",stipend:"Full coverage",deadline:"Sep 2026",fields:"Policy · Health · Education",website:"https://www.humphreyfellowship.org"},
+  {id:"FH-G025",name:"Erasmus Mundus Joint Masters",country:"Multiple European Countries",flag:"🇪🇺",org:"European Commission",level:"Masters",stipend:"€1,000/month",deadline:"Jan 2027",fields:"All disciplines",website:"https://eacea.ec.europa.eu"},
+  {id:"FH-G026",name:"Commonwealth Scholarship",country:"United Kingdom",flag:"🇬🇧",org:"CSC UK",level:"Masters · PhD",stipend:"~£2,000/month",deadline:"Oct 2026",fields:"All disciplines",website:"https://cscuk.fcdo.gov.uk"},
+  {id:"FH-G028",name:"Heinrich Böll Foundation Scholarships",country:"Germany",flag:"🇩🇪",org:"Heinrich Böll Foundation",level:"Masters · PhD",stipend:"€1,000–1,200/month",deadline:"Mar 2027",fields:"Social Sciences · Humanities",website:"https://www.boell.de"},
+  {id:"FH-G030",name:"Australia Awards Scholarships",country:"Australia",flag:"🇦🇺",org:"Australian Government",level:"Masters · PhD",stipend:"AUD 2,500/month",deadline:"Jun 2026",fields:"Development · STEM",website:"https://www.australiaawards.gov.au"},
+  {id:"FH-G031",name:"Vanier Canada Graduate Scholarships",country:"Canada",flag:"🇨🇦",org:"Government of Canada",level:"PhD",stipend:"CAD 50,000/year",deadline:"Nov 2026",fields:"Health · Sciences · Humanities",website:"https://vanier.gc.ca"},
+  {id:"FH-G032",name:"Mitacs Globalink Research Internship",country:"Canada",flag:"🇨🇦",org:"Mitacs",level:"Research Internship",stipend:"CAD 10,000 total",deadline:"Dec 2026",fields:"All disciplines",website:"https://www.mitacs.ca/globalink"},
+  {id:"FH-G033",name:"OAS Academic Scholarships",country:"Multiple Americas",flag:"🌎",org:"Organization of American States",level:"Masters · PhD",stipend:"~$1,000/month",deadline:"Oct 2026",fields:"Development · Social Sciences",website:"https://www.oas.org/en/scholarships/"},
+  {id:"FH-G034",name:"Coimbra Group Scholarships - LATAM",country:"Multiple European Countries",flag:"🇪🇺",org:"Coimbra Group",level:"Research Mobility",stipend:"~€1,500/month",deadline:"Verify 2027",fields:"All disciplines",website:"https://www.coimbra-group.eu"},
+  {id:"FH-G035",name:"ETH Zurich Excellence Scholarship",country:"Switzerland",flag:"🇨🇭",org:"ETH Zurich",level:"Masters",stipend:"CHF 12,000/semester",deadline:"Dec 2026",fields:"STEM · Architecture",website:"https://ethz.ch"},
+  {id:"FH-G036",name:"ETH Zurich Postdoctoral Fellowship",country:"Switzerland",flag:"🇨🇭",org:"ETH Zurich",level:"Postdoc",stipend:"CHF 6,500/month",deadline:"Sep 2026",fields:"All disciplines",website:"https://ethz.ch"},
+  {id:"FH-G037",name:"JSPS Postdoctoral Fellowships",country:"Japan",flag:"🇯🇵",org:"JSPS Japan",level:"Postdoc",stipend:"¥362,000/month",deadline:"Oct 2026",fields:"Sciences · Engineering",website:"https://www.jsps.go.jp"},
+  {id:"FH-G040",name:"Wellcome Trust Research Fellowships",country:"United Kingdom · Global",flag:"🇬🇧",org:"Wellcome Trust",level:"Postdoc · Research",stipend:"~£3,500/month",deadline:"Rolling",fields:"Biomedicine · Health",website:"https://wellcome.org"},
+  {id:"FH-G041",name:"Colfuturo Scholarships Colombia",country:"Colombia + Global",flag:"🇨🇴",org:"Colfuturo",level:"Masters · PhD",stipend:"Up to USD 28,000/yr",deadline:"Feb 2027",fields:"All disciplines",website:"https://www.colfuturo.org"},
+  {id:"FH-G044",name:"Türkiye Scholarships",country:"Turkey",flag:"🇹🇷",org:"Republic of Turkey",level:"Bachelor · Masters · PhD",stipend:"TRY 1,600/month",deadline:"Feb 2027",fields:"All disciplines",website:"https://www.turkiyeburslari.gov.tr"},
+  {id:"FH-G045",name:"Stipendium Hungaricum",country:"Hungary",flag:"🇭🇺",org:"Hungarian Government",level:"Bachelor · Masters · PhD",stipend:"HUF 43,700/month",deadline:"Jan 2027",fields:"All disciplines",website:"https://stipendiumhungaricum.hu"},
+  {id:"FH-ES001",name:"AUIP Scholarships - Spanish Universities",country:"Spain",flag:"🇪🇸",org:"AUIP",level:"Masters",stipend:"€1,500–2,500",deadline:"Mar–Jun 2027",fields:"All disciplines",website:"https://auip.org"},
+  {id:"FH-ES002",name:"AUIP Doctoral Scholarships Spain",country:"Spain",flag:"🇪🇸",org:"AUIP",level:"PhD",stipend:"Variable",deadline:"Jun–Jul 2027",fields:"All disciplines",website:"https://auip.org"},
+  {id:"FH-ES007",name:"JAE Intro CSIC Research Fellowships",country:"Spain",flag:"🇪🇸",org:"CSIC Spain",level:"Research Initiation",stipend:"€600/month",deadline:"Apr 2027",fields:"Life · Matter · Society · AI",website:"https://sede.csic.gob.es"},
+  {id:"FH-ES009",name:"Fundación Carolina Scholarships",country:"Spain",flag:"🇪🇸",org:"Fundación Carolina",level:"Masters · PhD",stipend:"€1,200/month",deadline:"Dec 2026",fields:"All disciplines",website:"https://www.fundacioncarolina.es"},
+  {id:"FH-FR001",name:"French Institute Scholarships LATAM",country:"France",flag:"🇫🇷",org:"Institut Français",level:"Masters · PhD",stipend:"€1,000/month",deadline:"Nov 2026",fields:"All disciplines",website:"https://www.institutfrancais.com"},
+  {id:"FH-FR002",name:"Sciences Po Émile Boutmy Scholarship",country:"France",flag:"🇫🇷",org:"Sciences Po",level:"Masters",stipend:"€14,000/year",deadline:"Mar 2027",fields:"Political Science · Economics",website:"https://www.sciencespo.fr"},
+  {id:"FH-BE001",name:"VLIR-UOS ICP Connect Scholarships",country:"Belgium",flag:"🇧🇪",org:"VLIR-UOS",level:"Masters",stipend:"€750/month",deadline:"Feb 2027",fields:"Development · STEM · Health",website:"https://www.vliruos.be"},
+  {id:"FH-BE002",name:"KU Leuven IRO PhD Scholarships",country:"Belgium",flag:"🇧🇪",org:"KU Leuven",level:"PhD",stipend:"€2,000/month",deadline:"Rolling",fields:"All disciplines",website:"https://www.kuleuven.be"},
+  {id:"FH-SE001",name:"Swedish Institute Scholarships (SISGP)",country:"Sweden",flag:"🇸🇪",org:"Swedish Institute",level:"Masters",stipend:"SEK 11,000/month",deadline:"Feb 2027",fields:"All disciplines",website:"https://si.se"},
+  {id:"FH-NL001",name:"Holland Scholarship",country:"Netherlands",flag:"🇳🇱",org:"Dutch Government",level:"Masters",stipend:"€5,000 lump sum",deadline:"Jan 2027",fields:"All disciplines",website:"https://www.studyinholland.nl"},
+  {id:"FH-NL002",name:"Maastricht High Potential Scholarship",country:"Netherlands",flag:"🇳🇱",org:"Maastricht University",level:"Masters",stipend:"€12,000/year + tuition",deadline:"Feb 2027",fields:"All disciplines",website:"https://www.maastrichtuniversity.nl"},
+  {id:"FH-PT001",name:"FCT PhD Scholarships Portugal",country:"Portugal",flag:"🇵🇹",org:"FCT Portugal",level:"PhD",stipend:"€1,074/month",deadline:"Mar 2027",fields:"All disciplines",website:"https://www.fct.pt"},
+  {id:"FH-PT002",name:"Camões Instituto Scholarships",country:"Portugal",flag:"🇵🇹",org:"Camões",level:"Masters · PhD",stipend:"€800/month",deadline:"Dec 2026",fields:"Lusophone studies · All disciplines",website:"https://www.instituto-camoes.pt"},
+  {id:"FH-CH001",name:"Swiss Government Excellence Scholarships",country:"Switzerland",flag:"🇨🇭",org:"ESKAS Switzerland",level:"Masters · PhD · Postdoc",stipend:"CHF 1,920/month",deadline:"Oct–Dec 2026",fields:"All disciplines",website:"https://www.sbfi.admin.ch"},
+  {id:"FH-ERC001",name:"ERC Starting Grant",country:"Multiple EU Countries",flag:"🇪🇺",org:"European Research Council",level:"Research Grant",stipend:"Up to €1.5M",deadline:"Various",fields:"All disciplines",website:"https://erc.europa.eu"},
+  {id:"FH-JP001",name:"JSPS Postdoctoral Fellowships",country:"Japan",flag:"🇯🇵",org:"JSPS",level:"Postdoc",stipend:"¥362,000/month",deadline:"Oct 2026",fields:"Sciences · Engineering",website:"https://www.jsps.go.jp"},
+  {id:"FH-SG001",name:"A*STAR Graduate Scholarship Singapore",country:"Singapore",flag:"🇸🇬",org:"A*STAR",level:"Masters · PhD",stipend:"SGD 3,200/month",deadline:"Oct 2026",fields:"STEM · Biomedical",website:"https://www.a-star.edu.sg"},
+  {id:"FH-MX001",name:"CONAHCYT Scholarships Mexico",country:"Mexico",flag:"🇲🇽",org:"CONAHCYT",level:"Masters · PhD",stipend:"MXN 18,000/month",deadline:"Apr 2027",fields:"All disciplines",website:"https://conahcyt.mx"},
+  {id:"FH-AR001",name:"CONICET Doctoral Scholarships Argentina",country:"Argentina",flag:"🇦🇷",org:"CONICET",level:"PhD · Postdoc",stipend:"~USD 400/month",deadline:"May 2027",fields:"All disciplines",website:"https://www.conicet.gov.ar"},
+  {id:"FH-CL001",name:"ANID Scholarships Chile",country:"Chile",flag:"🇨🇱",org:"ANID Chile",level:"PhD · Postdoc",stipend:"~USD 1,200/month",deadline:"Mar 2027",fields:"All disciplines",website:"https://anid.cl"},
+  {id:"FH-SA001",name:"KAUST Fellowship Saudi Arabia",country:"Saudi Arabia",flag:"🇸🇦",org:"KAUST",level:"Masters · PhD",stipend:"USD 30,000/year",deadline:"Jan 2027",fields:"STEM · Engineering",website:"https://admissions.kaust.edu.sa"},
+  {id:"FH-ZA001",name:"NRF South Africa Postdoctoral Fellowships",country:"South Africa",flag:"🇿🇦",org:"NRF South Africa",level:"Postdoc",stipend:"ZAR 200,000/year",deadline:"Aug 2026",fields:"All disciplines",website:"https://www.nrf.ac.za"},
+  {id:"FH-G041",name:"MinCiencias Doctoral Scholarships Colombia",country:"Colombia",flag:"🇨🇴",org:"MinCiencias",level:"PhD",stipend:"~USD 1,800/month",deadline:"May 2027",fields:"Science · Technology",website:"https://minciencias.gov.co"},
+  {id:"FH-IN001",name:"ICCR Indian Government Scholarships",country:"India",flag:"🇮🇳",org:"ICCR India",level:"Masters · PhD",stipend:"INR 35,000/month",deadline:"Mar 2027",fields:"All disciplines",website:"https://a2ascholarships.iccr.gov.in"}
+];
+
+// ══ INIT MAP ══
+const map = L.map('map', {zoomControl:false}).setView([25, 15], 2);
+L.control.zoom({position:'topright'}).addTo(map);
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution:'&copy; OpenStreetMap &copy; CARTO',
+  maxZoom:18
+}).addTo(map);
+
+// Group calls by country
+const byCountry = {};
+CALLS.forEach(c => {
+  if(!byCountry[c.country]) byCountry[c.country] = [];
+  byCountry[c.country].push(c);
+});
+
+// Create markers
+const markers = {};
+Object.entries(byCountry).forEach(([country, calls]) => {
+  const coords = COORDS[country];
+  if(!coords) return;
+
+  const [lat, lng] = Array.isArray(coords[0]) ? coords[0] : coords;
+  const primaryLevel = calls[0].level;
+  const color = getLevelColor(primaryLevel);
+  const count = calls.length;
+
+  const icon = L.divIcon({
+    html: `<div style="
+      background:${color};
+      width:${count > 2 ? 36 : 28}px;
+      height:${count > 2 ? 36 : 28}px;
+      border-radius:50%;
+      border:3px solid rgba(255,255,255,.9);
+      display:flex;align-items:center;justify-content:center;
+      font-size:${count > 1 ? '.72rem' : '.6rem'};
+      font-weight:700;color:#fff;
+      box-shadow:0 2px 8px rgba(0,0,0,.35);
+      font-family:'Work Sans',sans-serif;
+    ">${count > 1 ? count : ''}</div>`,
+    className:'',
+    iconSize:[count > 2 ? 36 : 28, count > 2 ? 36 : 28],
+    iconAnchor:[count > 2 ? 18 : 14, count > 2 ? 18 : 14]
+  });
+
+  const marker = L.marker([lat, lng], {icon}).addTo(map);
+  markers[country] = marker;
+
+  marker.on('click', () => {
+    if(calls.length === 1) {
+      showDetail(calls[0]);
+    } else {
+      showDetail(calls[0]);
+      highlightSidebarCountry(country);
+    }
+    map.setView([lat, lng], Math.max(map.getZoom(), 4), {animate:true});
+  });
+});
+
+// ══ SIDEBAR ══
+let levelFilter = '';
+let searchFilter = '';
+
+function renderSidebar(data) {
+  const list = document.getElementById('sidebar-list');
+  document.getElementById('sidebar-count').textContent = `Showing ${data.length} calls`;
+  list.innerHTML = data.map((c,i) => `
+    <div class="sidebar-item" id="si-${c.id}" onclick="sidebarClick('${c.id}','${c.country}')">
+      <div class="sidebar-item-top">
+        <div class="sidebar-item-name">${c.name}</div>
+        <span class="sidebar-item-flag">${c.flag}</span>
+      </div>
+      <div class="sidebar-item-org">${c.org} · ${c.country}</div>
+      <div class="sidebar-item-meta">
+        <span class="tag-xs ${getLevelClass(c.level)}">${c.level.split('·')[0].trim()}</span>
+        <span class="sidebar-item-deadline">${c.deadline}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function sidebarClick(id, country) {
+  const call = CALLS.find(c => c.id === id);
+  if(!call) return;
+  showDetail(call);
+  document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('selected'));
+  const el = document.getElementById(`si-${id}`);
+  if(el) { el.classList.add('selected'); el.scrollIntoView({block:'nearest'}); }
+  const coords = COORDS[country];
+  if(coords) {
+    const [lat, lng] = Array.isArray(coords[0]) ? coords[0] : coords;
+    map.setView([lat, lng], 5, {animate:true});
+  }
+}
+
+function highlightSidebarCountry(country) {
+  const call = CALLS.find(c => c.country === country);
+  if(call) sidebarClick(call.id, country);
+}
+
+function setLevel(el, level) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  levelFilter = level;
+  filterSidebar();
+}
+
+function filterSidebar() {
+  searchFilter = document.getElementById('sidebar-search').value.toLowerCase();
+  const filtered = CALLS.filter(c => {
+    const matchSearch = !searchFilter ||
+      c.name.toLowerCase().includes(searchFilter) ||
+      c.country.toLowerCase().includes(searchFilter) ||
+      c.org.toLowerCase().includes(searchFilter);
+    const matchLevel = !levelFilter || c.level.toLowerCase().includes(levelFilter.toLowerCase());
+    return matchSearch && matchLevel;
+  });
+  renderSidebar(filtered);
+}
+
+function getLevelColor(level) {
+  const l = level.toLowerCase();
+  if(l.includes('phd')||l.includes('doctoral')) return '#233B52';
+  if(l.includes('master')) return '#325879';
+  if(l.includes('postdoc')) return '#E5A818';
+  if(l.includes('research')) return '#5a9e6f';
+  return '#9b7fd4';
+}
+
+function getLevelClass(level) {
+  const l = level.toLowerCase();
+  if(l.includes('phd')) return 'tag-phd-xs';
+  if(l.includes('master')) return 'tag-masters-xs';
+  if(l.includes('postdoc')) return 'tag-postdoc-xs';
+  return 'tag-other-xs';
+}
+
+// ══ DETAIL PANEL ══
+function showDetail(c) {
+  document.getElementById('d-flag').textContent = c.flag;
+  document.getElementById('d-name').textContent = c.name;
+  document.getElementById('d-org').textContent = c.org;
+  document.getElementById('d-stipend').textContent = c.stipend;
+  document.getElementById('d-level').textContent = c.level;
+  document.getElementById('d-deadline').textContent = c.deadline;
+  document.getElementById('d-fields').textContent = c.fields.length > 60 ? c.fields.substring(0,60)+'…' : c.fields;
+  document.getElementById('d-link').href = c.website;
+  document.getElementById('detail-panel').classList.add('open');
+}
+
+function closeDetail() {
+  document.getElementById('detail-panel').classList.remove('open');
+}
+
+function setLang(lang) {
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent.toLowerCase() === lang));
+}
+
+// INIT
+renderSidebar(CALLS);
+document.getElementById('sidebar-sub').textContent = `${CALLS.length} funded opportunities · ${Object.keys(byCountry).length} countries`;
+</script>
+</body>
+</html>
