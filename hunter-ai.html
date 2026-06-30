@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hunter AI | Fellowship Hunter</title>
+<script src="i18n.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -694,6 +695,61 @@ function setLang(lang) {
 
 // INIT
 selectTool('finder');
+
+/* ── i18n ── */
+function applyPageTranslations(lang) {
+  FH_LANG = lang;
+  const t = key => fhT('ai', key);
+  // sidebar header
+  const sh = document.querySelector('.tools-header h2');
+  if(sh) sh.textContent = t('sidebar_title');
+  const sp = document.querySelector('.tools-header p');
+  if(sp) sp.textContent = t('sidebar_sub');
+  // section dividers
+  const divs = document.querySelectorAll('.tools-divider');
+  const divKeys = ['tools_discover','tools_create','tools_analyze'];
+  divs.forEach((d,i) => { if(divKeys[i]) d.textContent = t(divKeys[i]); });
+  // tool names and descs
+  const toolMap = {
+    'tool-finder': ['tool_finder_name','tool_finder_desc'],
+    'tool-letter': ['tool_letter_name','tool_letter_desc'],
+    'tool-cv':     ['tool_cv_name','tool_cv_desc'],
+    'tool-doc':    ['tool_doc_name','tool_doc_desc'],
+    'tool-interview':['tool_interview_name','tool_interview_desc'],
+  };
+  Object.entries(toolMap).forEach(([id,[nameKey,descKey]]) => {
+    const el = document.getElementById(id);
+    if(el) {
+      const nameEl = el.querySelector('.tool-name');
+      const descEl = el.querySelector('.tool-desc');
+      if(nameEl) nameEl.textContent = t(nameKey);
+      if(descEl) descEl.textContent = t(descKey);
+    }
+  });
+  // status
+  const st = document.querySelector('.chat-status');
+  if(st) st.innerHTML = '<span class="status-dot"></span>' + t('status');
+  // input placeholder
+  const inp = document.getElementById('chat-input');
+  if(inp) inp.placeholder = t('input_ph');
+  // upload buttons
+  const ubs = document.querySelectorAll('.upload-btn');
+  if(ubs[0]) ubs[0].childNodes[0].textContent = t('upload_cv') + ' ';
+  if(ubs[1]) ubs[1].childNodes[0].textContent = t('upload_doc') + ' ';
+  // footer
+  const fps = document.querySelectorAll('.input-footer span');
+  if(fps[0]) fps[0].innerHTML = t('footer_privacy') + ' <a href="advisory.html">' + t('footer_human') + '</a>';
+  // badge
+  const badge = document.querySelector('.tool-badge');
+  if(badge) badge.textContent = t('badge_new');
+  // re-select current tool to update welcome message in correct language
+  const savedTool = currentTool;
+  if(lang !== 'en') {
+    // update welcome message language hint
+    TOOLS[currentTool].system = TOOLS[currentTool].system;
+  }
+}
+initI18n('ai');
 </script>
 </body>
 </html>
