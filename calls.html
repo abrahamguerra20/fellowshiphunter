@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Active Calls | Fellowship Hunter</title>
+<script src="i18n.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -169,7 +170,7 @@ nav.main-nav a.active{font-weight:700;color:var(--gold)}
 <section class="page-hero">
   <div class="page-hero-grid"></div>
   <div class="page-hero-inner">
-    <div class="page-hero-tag">🎯 Global Database</div>
+    <div class="page-hero-tag" data-i18n="page_tag">🎯 Global Database</div>
     <h1>Every funded call. <em>Decoded.</em></h1>
     <p>88 fully funded opportunities across 35+ countries — with real deadlines, real stipends, and the context to actually win them.</p>
     <div class="hero-meta">
@@ -185,13 +186,13 @@ nav.main-nav a.active{font-weight:700;color:var(--gold)}
 <div class="filter-section">
   <div class="filter-inner">
     <div class="filter-search">
-      <input type="text" id="search-input" placeholder="Search by name, country, field…" oninput="applyFilters()">
+      <input type="text" id="search-input" placeholder="Search by name, country, field…" data-i18n-ph="search_ph" oninput="applyFilters()">
     </div>
     <select class="filter-select" id="filter-country" onchange="applyFilters()">
-      <option value="">All Countries</option>
+      <option value="" data-i18n="filter_country">All Countries</option>
     </select>
     <select class="filter-select" id="filter-level" onchange="applyFilters()">
-      <option value="">All Levels</option>
+      <option value="" data-i18n="filter_all_levels">All Levels</option>
       <option value="Masters">Masters</option>
       <option value="PhD">PhD</option>
       <option value="Postdoc">Postdoc</option>
@@ -200,12 +201,12 @@ nav.main-nav a.active{font-weight:700;color:var(--gold)}
       <option value="Liderazgo">Leadership</option>
     </select>
     <select class="filter-select" id="filter-priority" onchange="applyFilters()">
-      <option value="">All Priorities</option>
-      <option value="ALTA">⭐ High Priority</option>
-      <option value="MEDIA">Medium Priority</option>
+      <option value="" data-i18n="filter_priority">All Priorities</option>
+      <option value="ALTA" data-i18n="priority_high">⭐ High Priority</option>
+      <option value="MEDIA" data-i18n="priority_med">Medium Priority</option>
     </select>
     <span class="filter-count" id="filter-count">Showing 88 calls</span>
-    <button class="filter-reset" onclick="resetFilters()">Clear filters</button>
+    <button class="filter-reset" onclick="resetFilters()" data-i18n="clear">Clear filters</button>
   </div>
 </div>
 
@@ -446,7 +447,7 @@ function renderCards(data) {
       </div>
       <div class="call-tags">
         <span class="tag ${getLevelTag(c.level)}">${c.level.split('·')[0].trim()}</span>
-        ${c.priority === 'ALTA' ? '<span class="tag tag-high">⭐ High Priority</span>' : ''}
+        ${c.priority === 'ALTA' ? '<span class="tag tag-high" data-i18n="priority_high">⭐ High Priority</span>' : ''}
       </div>
       <div class="call-foot">
         <button class="btn-sm btn-sm-gold" onclick="event.stopPropagation();openModal(${CALLS.indexOf(c)})">View Details</button>
@@ -503,7 +504,7 @@ function openModal(idx) {
   document.getElementById('m-link').href = c.website;
   document.getElementById('m-tags').innerHTML = `
     <span class="tag ${getLevelTag(c.level)}">${c.level}</span>
-    ${c.priority === 'ALTA' ? '<span class="tag tag-high">⭐ High Priority</span>' : '<span class="tag tag-research">Medium Priority</span>'}
+    ${c.priority === 'ALTA' ? '<span class="tag tag-high" data-i18n="priority_high">⭐ High Priority</span>' : '<span class="tag tag-research" data-i18n="priority_med">Medium Priority</span>'}
     <span class="tag tag-mobility">${c.type}</span>
   `;
   document.getElementById('modal-overlay').classList.add('open');
@@ -529,6 +530,35 @@ function setLang(lang) {
 }
 
 init();
+
+/* ── i18n integration ── */
+function applyPageTranslations(lang) {
+  FH_LANG = lang;
+  // re-apply all data-i18n
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const val = fhT('calls', key);
+    if(val && val !== key) el.innerHTML = val;
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    const key = el.getAttribute('data-i18n-ph');
+    const val = fhT('calls', key);
+    if(val && val !== key) el.placeholder = val;
+  });
+  // update hero texts
+  document.querySelector('.page-hero h1').innerHTML = fhT('calls','page_title');
+  document.querySelector('.page-hero p').textContent = fhT('calls','page_sub');
+  // update stat labels
+  const statLabels = document.querySelectorAll('.hero-meta-item');
+  if(statLabels[0]) statLabels[0].lastChild.textContent = fhT('calls','stat_calls');
+  if(statLabels[1]) statLabels[1].lastChild.textContent = fhT('calls','stat_countries');
+  if(statLabels[2]) statLabels[2].lastChild.textContent = fhT('calls','stat_levels');
+  if(statLabels[3]) statLabels[3].lastChild.textContent = fhT('calls','stat_funded');
+  // re-render cards with translated labels
+  applyFilters();
+}
+
+initI18n('calls');
 </script>
 </body>
 </html>
