@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Advisory Services | Fellowship Hunter</title>
+<script src="i18n.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -494,9 +495,81 @@ const observer = new IntersectionObserver(entries => {
 },{threshold:0.1});
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-function setLang(lang) {
-  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent.toLowerCase() === lang));
+function applyPageTranslations(lang) {
+  FH_LANG = lang;
+  const t = key => fhT('advisory', key);
+  // hero
+  const tag = document.querySelector('.hero-tag');
+  if(tag) tag.textContent = t('page_tag');
+  const h1 = document.querySelector('.page-hero h1');
+  if(h1) h1.innerHTML = t('page_title');
+  const sub = document.querySelector('.page-hero p');
+  if(sub) sub.textContent = t('page_sub');
+  // hero buttons
+  const btns = document.querySelectorAll('.hero-ctas .btn');
+  if(btns[0]) btns[0].textContent = t('btn_try');
+  if(btns[1]) btns[1].textContent = t('btn_meet');
+  // section 1
+  const ey = document.querySelector('.sec-alt .eyebrow');
+  if(ey) ey.textContent = t('sec1_eyebrow');
+  const st = document.querySelector('.sec-alt .sec-title');
+  if(st) st.textContent = t('sec1_title');
+  const sl = document.querySelector('.sec-alt .sec-lead');
+  if(sl) sl.textContent = t('sec1_lead');
+  // featured card
+  const fl = document.querySelector('.featured-label');
+  if(fl) fl.textContent = t('featured_label');
+  const ft = document.querySelector('.service-card.featured h3');
+  if(ft) ft.textContent = t('featured_title');
+  const fd = document.querySelector('.service-card.featured > .featured-inner > div > p');
+  if(fd) fd.textContent = t('featured_desc');
+  // how it works
+  const hows = document.querySelectorAll('.sec-cream .eyebrow, .sec-cream .sec-title, .sec-cream .sec-lead');
+  const howKeys = ['how_eyebrow','how_title','how_lead'];
+  hows.forEach((el,i) => { if(howKeys[i]) el.innerHTML = t(howKeys[i]); });
+  // steps
+  const steps = document.querySelectorAll('.step');
+  const stepKeys = [
+    ['step1_title','step1_desc'],['step2_title','step2_desc'],
+    ['step3_title','step3_desc'],['step4_title','step4_desc']
+  ];
+  steps.forEach((s,i) => {
+    if(stepKeys[i]) {
+      const h4 = s.querySelector('h4');
+      const p = s.querySelector('p');
+      if(h4) h4.textContent = t(stepKeys[i][0]);
+      if(p) p.textContent = t(stepKeys[i][1]);
+    }
+  });
+  // AI section
+  const aiEy = document.querySelector('.ai-left .eyebrow');
+  if(aiEy) aiEy.textContent = t('ai_eyebrow');
+  const aiH = document.querySelector('.ai-left h2');
+  if(aiH) aiH.innerHTML = t('ai_title');
+  const aiP = document.querySelector('.ai-left p');
+  if(aiP) aiP.textContent = t('ai_desc');
+  const aiBtn = document.querySelector('.ai-left .btn');
+  if(aiBtn) aiBtn.textContent = t('btn_try');
+  // RICAI
+  const rb = document.querySelector('.ricai-badge');
+  if(rb) rb.textContent = t('ricai_badge');
+  const rh = document.querySelector('.ricai-inner h2');
+  if(rh) rh.textContent = t('ricai_title');
+  const rl = document.querySelector('.ricai-inner .sec-lead');
+  if(rl) rl.textContent = t('ricai_lead');
+  // CTA
+  const cb = document.querySelector('.free-badge');
+  if(cb) cb.textContent = t('cta_badge');
+  const ch = document.querySelector('.cta-card h2');
+  if(ch) ch.textContent = t('cta_title');
+  const cp = document.querySelector('.cta-card p');
+  if(cp) cp.textContent = t('cta_desc');
+  const frees = document.querySelectorAll('.free-item span:last-child');
+  const freeKeys = ['free1','free2','free3','free4'];
+  frees.forEach((el,i) => { if(freeKeys[i]) el.textContent = t(freeKeys[i]); });
 }
+
+initI18n('advisory');
 </script>
 </body>
 </html>
