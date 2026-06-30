@@ -6,6 +6,7 @@
 <title>Global Map | Fellowship Hunter</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="i18n.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
 :root{--navy:#233B52;--steel:#325879;--gold:#E5A818;--cream:#F0EBE3;--white:#fff;--dark:#141E27;--muted:#5A7080;--border:rgba(35,59,82,0.1);--font-h:'Lora',serif;--font-b:'Work Sans',sans-serif;--t:0.22s}
@@ -139,7 +140,7 @@ nav.main-nav a.active{font-weight:700;color:var(--gold);background:var(--cream)}
       <div class="sidebar-sub" id="sidebar-sub">88 funded opportunities · 35+ countries</div>
     </div>
     <div class="sidebar-search">
-      <input type="text" id="sidebar-search" placeholder="Search calls…" oninput="filterSidebar()">
+      <input type="text" id="sidebar-search" placeholder="Search calls…" data-i18n-ph="search_ph" oninput="filterSidebar()">
     </div>
     <div class="sidebar-filters">
       <button class="filter-chip active" data-level="" onclick="setLevel(this,'')">All</button>
@@ -455,6 +456,31 @@ function setLang(lang) {
 
 // INIT
 renderSidebar(CALLS);
+
+/* ── i18n ── */
+function applyPageTranslations(lang) {
+  FH_LANG = lang;
+  const t = key => fhT('map', key);
+  // sidebar header
+  const sh = document.querySelector('.sidebar-title');
+  if(sh) sh.textContent = t('page_title');
+  // search placeholder
+  const si = document.getElementById('sidebar-search');
+  if(si) si.placeholder = t('search_ph');
+  // filter chips
+  const chips = document.querySelectorAll('.filter-chip');
+  const chipKeys = ['filter_all','filter_phd','filter_masters','filter_postdoc','filter_research'];
+  chips.forEach((ch,i) => { if(chipKeys[i]) ch.textContent = t(chipKeys[i]); });
+  // legend
+  const lt = document.querySelector('.legend-title');
+  if(lt) lt.textContent = t('legend_title');
+  // detail buttons
+  const db1 = document.querySelector('#d-link');
+  if(db1) db1.textContent = t('btn_site');
+  // re-render sidebar count
+  filterSidebar();
+}
+initI18n('map');
 document.getElementById('sidebar-sub').textContent = `${CALLS.length} funded opportunities · ${Object.keys(byCountry).length} countries`;
 </script>
 </body>
